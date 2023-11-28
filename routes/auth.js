@@ -6,20 +6,42 @@ const User = require("../models/user");
 const router = express.Router();
 
 router.post("/register", async (req, res) => {
-  const { email, fullname, password } = req.body;
-
   try {
+    const { fullname, email, password } = req.body;
+
+    // Check if the user with the given email already exists
+    const existingUser = await User.findOne({ where: { email: email } });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already exists" });
+    }
+
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await User.create({
-      email,
-      fullname,
+
+    // Create a new user
+    const newUser = await User.create({
+      fullname: fullname,
+      email: email,
       password: hashedPassword,
     });
 
-    res.status(201).json({ message: "User registered successfully" });
+    res
+      .status(201)
+      .json({ message: "User registered successfully", user: newUser });
   } catch (error) {
-    console.error("Error registering user", error);
-    res.status(500).json({ message: "Internal server error" });
+    if (error.name === "SequelizeValidationError") {
+      // Handle validation errors
+      const validationErrors = error.errors.map((err) => ({
+        message: err.message,
+        field: err.path,
+      }));
+      return res
+        .status(400)
+        .json({ message: "Validation error", errors: validationErrors });
+    }
+
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 });
 

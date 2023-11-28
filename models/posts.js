@@ -54,7 +54,11 @@ const Posts = sequelize.define("Post", {
 });
 
 // Establish the association
-Posts.belongsTo(User, { foreignKey: "id_user" });
+Posts.belongsTo(User, {
+  foreignKey: "id_user",
+  constraints: false,
+  foreignKeyConstraint: true,
+});
 User.hasMany(Posts, { foreignKey: "id_user" });
 
 module.exports = Posts;

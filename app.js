@@ -25,7 +25,6 @@ app.use(bodyParser.json());
 app.use(
   session({ secret: sessionSecret, resave: true, saveUninitialized: true })
 );
-app.use(helmet()); // Menggunakan Helmet untuk keamanan
 
 app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
@@ -41,5 +40,5 @@ app.get("/users", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running`);
+  console.log(`Server is running on port`);
 });

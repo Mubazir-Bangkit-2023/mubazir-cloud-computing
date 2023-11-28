@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken"); // Add this line
 const Post = require("../models/posts");
 
 // Create a new post
-router.post("/addPosts", async (req, res) => {
+router.post("/", async (req, res) => {
   const { name, description, price, img_url, lat, lon, id_cat, is_available } =
     req.body;
 
@@ -39,7 +39,7 @@ router.post("/addPosts", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-router.get("/allPosts", async (req, res) => {
+router.get("/All", async (req, res) => {
   try {
     const allPosts = await Post.findAll();
     res.status(200).json({ posts: allPosts });
