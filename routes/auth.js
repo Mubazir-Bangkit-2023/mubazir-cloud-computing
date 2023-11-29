@@ -104,4 +104,21 @@ router.get("/protected", async (req, res) => {
   });
 });
 
+router.post("/logout", (req, res) => {
+  const authHeader = req.headers["authorization"];
+
+  if (!authHeader) {
+    return res.status(401).json({ message: "Unauthorized: Missing token" });
+  }
+
+  const token = authHeader.split(" ")[1];
+
+  try {
+    const decodedToken = jwt.verify(token, "your-secret-key");
+    res.json({ message: "Logout successful" });
+  } catch (err) {
+    res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
+});
+
 module.exports = router;
