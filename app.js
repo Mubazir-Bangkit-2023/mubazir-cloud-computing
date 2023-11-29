@@ -10,7 +10,6 @@ const app = express();
 const port = process.env.PORT;
 const sessionSecret = process.env.SESSION_SECRET;
 
-// Sync the models with the database
 sequelize
   .sync()
   .then(() => {
@@ -20,7 +19,6 @@ sequelize
     console.error("Error syncing database", err);
   });
 
-// Middleware
 app.use(bodyParser.json());
 app.use(
   session({ secret: sessionSecret, resave: true, saveUninitialized: true })

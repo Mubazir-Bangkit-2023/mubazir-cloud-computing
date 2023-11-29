@@ -1,14 +1,14 @@
 const { DataTypes } = require("sequelize");
-const { v4: uuidv4 } = require("uuid"); // Import uuid correctly
+const { v4: uuidv4 } = require("uuid");
 const sequelize = require("../config/db");
 const User = require("./user");
 
 const Posts = sequelize.define("Post", {
   id: {
-    type: DataTypes.UUID, // Change the type to UUID
+    type: DataTypes.UUID,
     primaryKey: true,
     allowNull: false,
-    defaultValue: () => uuidv4(), // Use uuidv4 as the default value
+    defaultValue: () => uuidv4(),
   },
   name: {
     type: DataTypes.STRING,
@@ -39,7 +39,7 @@ const Posts = sequelize.define("Post", {
     allowNull: false,
   },
   id_user: {
-    type: DataTypes.UUID, // Change the type to UUID
+    type: DataTypes.UUID,
     allowNull: false,
     references: {
       model: User,
@@ -53,7 +53,6 @@ const Posts = sequelize.define("Post", {
   },
 });
 
-// Establish the association
 Posts.belongsTo(User, {
   foreignKey: "id_user",
   constraints: false,
