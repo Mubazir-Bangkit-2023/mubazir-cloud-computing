@@ -12,32 +12,30 @@ router.post("/register", async (req, res) => {
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(400).json({ message: "Email Sudah ada!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = await User.create({
+    await User.create({
       fullname: fullname,
       email: email,
       password: hashedPassword,
     });
 
-    res
-      .status(201)
-      .json({ message: "User registered successfully", user: newUser });
+    res.status(201).json({ message: "Registrasi User Sukses!" });
   } catch (error) {
-    if (error.name === "SequelizeValidationError") {
+    if (error.name === "Validasi Sequelize Error!") {
       const validationErrors = error.errors.map((err) => ({
         message: err.message,
         field: err.path,
       }));
       return res
         .status(400)
-        .json({ message: "Validation error", errors: validationErrors });
+        .json({ message: "Validasi Error", errors: validationErrors });
     }
 
     console.error(error);
-    res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
