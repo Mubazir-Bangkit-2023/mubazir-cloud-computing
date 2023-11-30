@@ -51,11 +51,9 @@ router.put("/:categoryId", async (req, res) => {
       { category },
       { where: { id: categoryId } }
     );
-
     if (updatedCategory[0] === 0) {
       return res.status(404).json({ message: "Category not found" });
     }
-
     res.status(200).json({ message: "Category updated successfully" });
   } catch (error) {
     console.error("Error updating category", error);
@@ -69,11 +67,9 @@ router.delete("/:categoryId", async (req, res) => {
     const deletedCategory = await Category.destroy({
       where: { id: categoryId },
     });
-
     if (!deletedCategory) {
       return res.status(404).json({ message: "Category not found" });
     }
-
     res.status(200).json({ message: "Category deleted successfully" });
   } catch (error) {
     console.error("Error deleting category", error);

@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/posts");
 const ImgUpload = require("../config/imgUploadedGcs");
+const bcrypt = require("bcryptjs");
 
 router.post(
   "/addPosts/:id_user",

@@ -44,15 +44,12 @@ router.post("/register", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ where: { email } });
-
     if (!user || !(await bcrypt.compare(password, user.password))) {
       res.status(401).json({ message: "Invalid email or password" });
       return;
     }
-
     const token = jwt.sign(
       { id: user.id, email: user.email },
       process.env.SECRET_KEY,
@@ -60,8 +57,13 @@ router.post("/login", async (req, res) => {
         expiresIn: "1h",
       }
     );
-
-    res.json({ message: "Login successful", id: user.id, token });
+    res.json({
+      message: "Login successful",
+      data: {
+        userId: user.id,
+        token: token,
+      },
+    });
   } catch (error) {
     console.error("Error during login", error);
     res.status(500).json({ message: "Internal server error" });
