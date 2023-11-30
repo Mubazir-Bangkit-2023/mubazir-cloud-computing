@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
       { id: user.id, email: user.email },
       process.env.SECRET_KEY,
       {
-        expiresIn: "1h",
+        expiresIn: "365d",
       }
     );
     res.json({
