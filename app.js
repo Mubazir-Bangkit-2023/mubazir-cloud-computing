@@ -2,9 +2,11 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const sequelize = require("./config/db");
+const jwt = require("jsonwebtoken");
 const User = require("./models/user");
 const authRoutes = require("./routes/auth");
 const postsRoutes = require("./routes/postsRoutes");
+const CategoriesRoutes = require("./routes/categoryRoutes");
 
 const app = express();
 const port = process.env.PORT;
@@ -26,8 +28,21 @@ app.use(
 
 app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
+app.use("/categories", CategoriesRoutes);
 
-app.get("/users", async (req, res) => {
+app.get("/:token", (req, res) => {
+  const { token } = req.params;
+
+  jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
+    if (err) {
+      res.status(401).send("Unauthorized: Invalid token");
+    } else {
+      res.send(`Welcome ${decodedToken.email}!`);
+    }
+  });
+});
+
+app.get("/allUsers", async (req, res) => {
   try {
     const users = await User.findAll();
     res.json(users);

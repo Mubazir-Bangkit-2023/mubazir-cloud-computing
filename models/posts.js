@@ -2,6 +2,7 @@ const { DataTypes } = require("sequelize");
 const { v4: uuidv4 } = require("uuid");
 const sequelize = require("../config/db");
 const User = require("./user");
+const Category = require("./category");
 
 const Posts = sequelize.define("Post", {
   id: {
@@ -33,6 +34,10 @@ const Posts = sequelize.define("Post", {
   lon: {
     type: DataTypes.FLOAT,
     allowNull: true,
+    references: {
+      model: Category,
+      key: "id",
+    },
   },
   id_cat: {
     type: DataTypes.INTEGER,
@@ -59,5 +64,12 @@ Posts.belongsTo(User, {
   foreignKeyConstraint: true,
 });
 User.hasMany(Posts, { foreignKey: "id_user" });
+
+Posts.belongsTo(Category, {
+  foreignKey: "id_cat",
+  constraints: false,
+  foreignKeyConstraint: true,
+});
+Category.hasMany(Posts, { foreignKey: "id_cat" });
 
 module.exports = Posts;
