@@ -9,6 +9,9 @@ const invalidatedTokens = new Set();
 router.post("/register", async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
+    if (!fullname || !email || !password) {
+      return res.status(400).json({ message: "Semua field harus diisi!" });
+    }
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
@@ -24,7 +27,7 @@ router.post("/register", async (req, res) => {
 
     res.status(201).json({ message: "Registrasi User Sukses!" });
   } catch (error) {
-    if (error.name === "Validasi Sequelize Error!") {
+    if (error.name === "SequelizeValidationError") {
       const validationErrors = error.errors.map((err) => ({
         message: err.message,
         field: err.path,
@@ -109,9 +112,7 @@ router.post("/logout", (req, res) => {
   if (!authHeader) {
     return res.status(401).json({ message: "Unauthorized: Missing token" });
   }
-
   const token = authHeader.split(" ")[1];
-
   try {
     invalidatedTokens.add(token);
     res.json({ message: "Logout successful" });
