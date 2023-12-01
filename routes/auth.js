@@ -28,9 +28,7 @@ router.post("/register", async (req, res) => {
       email: email,
       password: hashedPassword,
     });
-    res
-      .status(201)
-      .json({ message: "User registration successful!", data: null });
+    res.status(201).json({ message: "User registration successful!" });
   } catch (error) {
     if (error.name === "SequelizeValidationError") {
       const validationErrors = error.errors.map((err) => ({
