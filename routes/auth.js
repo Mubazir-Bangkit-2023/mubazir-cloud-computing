@@ -15,7 +15,6 @@ router.post("/register", async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: "Email already exists!" });
     }
-
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
       fullname: fullname,
@@ -58,7 +57,7 @@ router.post("/login", async (req, res) => {
     res.json({
       message: "Login successful",
       data: {
-        userId: user.id,
+        idUser: user.id,
         name: user.fullname,
         photo_url: user.photo_url,
         no_hp: user.no_hp,
@@ -67,13 +66,16 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Error during login", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+      stack: error.stack,
+    });
   }
 });
 
 router.post("/logout", (req, res) => {
   const authHeader = req.headers["authorization"];
-
   if (!authHeader) {
     return res.status(401).json({ message: "Unauthorized: Missing token" });
   }
