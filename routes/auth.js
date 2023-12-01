@@ -2,7 +2,6 @@ const express = require("express");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
-
 const router = express.Router();
 const invalidatedTokens = new Set();
 
@@ -10,12 +9,16 @@ router.post("/register", async (req, res) => {
   try {
     const { fullname, email, password } = req.body;
     if (!fullname || !email || !password) {
-      return res.status(400).json({ message: "Semua field harus diisi!" });
+      return res
+        .status(400)
+        .json({ message: "All fields must be filled!", data: null });
     }
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
-      return res.status(400).json({ message: "Email Sudah ada!" });
+      return res
+        .status(400)
+        .json({ message: "Email already exists!", data: null });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -24,8 +27,9 @@ router.post("/register", async (req, res) => {
       email: email,
       password: hashedPassword,
     });
-
-    res.status(201).json({ message: "Registrasi User Sukses!" });
+    res
+      .status(201)
+      .json({ message: "User registration successful!", data: null });
   } catch (error) {
     if (error.name === "SequelizeValidationError") {
       const validationErrors = error.errors.map((err) => ({
@@ -34,11 +38,13 @@ router.post("/register", async (req, res) => {
       }));
       return res
         .status(400)
-        .json({ message: "Validasi Error", errors: validationErrors });
+        .json({
+          message: "Validation Error",
+          data: { errors: validationErrors },
+        });
     }
-
     console.error(error);
-    res.status(500).json({ message: "Server Error" });
+    res.status(500).json({ message: "Server Error", data: null });
   }
 });
 
@@ -47,7 +53,9 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      res.status(401).json({ message: "Invalid email or password" });
+      res
+        .status(401)
+        .json({ message: "Invalid email or password", data: null });
       return;
     }
     const token = jwt.sign(
@@ -66,60 +74,26 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Error during login", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error", data: null });
   }
-});
-
-router.get("/protected", async (req, res) => {
-  const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
-
-  if (!token) {
-    res.status(401).json({ message: "Unauthorized: Missing token" });
-    return;
-  }
-
-  if (invalidatedTokens.has(token)) {
-    res.status(401).json({ message: "Unauthorized: Token invalidated" });
-    return;
-  }
-
-  jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
-    if (err) {
-      res.status(401).json({ message: "Unauthorized: Invalid token" });
-      return;
-    }
-
-    const userId = decodedToken.id;
-
-    User.findOne({ where: { id: userId } })
-      .then((user) => {
-        if (!user) {
-          res.status(401).json({ message: "Unauthorized: User not found" });
-          return;
-        }
-
-        res.send(`Welcome ${user.username}!`);
-      })
-      .catch((err) => {
-        console.error("Error fetching user", err);
-        res.status(500).json({ message: "Internal server error" });
-      });
-  });
 });
 
 router.post("/logout", (req, res) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
-    return res.status(401).json({ message: "Unauthorized: Missing token" });
+    return res
+      .status(401)
+      .json({ message: "Unauthorized: Missing token", data: null });
   }
   const token = authHeader.split(" ")[1];
   try {
     invalidatedTokens.add(token);
-    res.json({ message: "Logout successful" });
+    res.json({ message: "Logout successful", data: null });
   } catch (err) {
-    res.status(401).json({ message: "Unauthorized: Invalid token" });
+    res
+      .status(401)
+      .json({ message: "Unauthorized: Invalid token", data: null });
   }
 });
 
