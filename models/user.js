@@ -14,6 +14,14 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING(100),
     allowNull: false,
   },
+  no_hp: {
+    type: DataTypes.STRING(20),
+    allowNull: false,
+  },
+  photo_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
