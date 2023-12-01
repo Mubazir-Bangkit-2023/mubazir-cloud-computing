@@ -34,14 +34,14 @@ const Posts = sequelize.define("Post", {
   lon: {
     type: DataTypes.FLOAT,
     allowNull: true,
-    references: {
-      model: Category,
-      key: "id",
-    },
   },
   id_cat: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    references: {
+      model: Category,
+      key: "id",
+    },
   },
   id_user: {
     type: DataTypes.UUID,
