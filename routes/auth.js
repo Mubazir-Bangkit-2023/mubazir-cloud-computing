@@ -7,8 +7,8 @@ const invalidatedTokens = new Set();
 
 router.post("/register", async (req, res) => {
   try {
-    const { fullname, email, password } = req.body;
-    if (!fullname || !email || !password) {
+    const { fullname, no_hp, email, password } = req.body;
+    if (!fullname || !no_hp || !email || !password) {
       return res
         .status(400)
         .json({ message: "All fields must be filled!", data: null });
@@ -24,6 +24,7 @@ router.post("/register", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     await User.create({
       fullname: fullname,
+      no_hp: no_hp,
       email: email,
       password: hashedPassword,
     });
@@ -36,12 +37,10 @@ router.post("/register", async (req, res) => {
         message: err.message,
         field: err.path,
       }));
-      return res
-        .status(400)
-        .json({
-          message: "Validation Error",
-          data: { errors: validationErrors },
-        });
+      return res.status(400).json({
+        message: "Validation Error",
+        data: { errors: validationErrors },
+      });
     }
     console.error(error);
     res.status(500).json({ message: "Server Error", data: null });
@@ -69,6 +68,9 @@ router.post("/login", async (req, res) => {
       message: "Login successful",
       data: {
         userId: user.id,
+        name: user.fullname,
+        photo_url: user.photo_url,
+        no_hp: user.no_hp,
         token: token,
       },
     });
