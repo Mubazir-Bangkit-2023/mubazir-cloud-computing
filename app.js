@@ -30,18 +30,6 @@ app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
 app.use("/categories", CategoriesRoutes);
 
-app.get("/:token", (req, res) => {
-  const { token } = req.params;
-
-  jwt.verify(token, process.env.SECRET_KEY, (err, decodedToken) => {
-    if (err) {
-      res.status(401).send("Unauthorized: Invalid token");
-    } else {
-      res.send(`Welcome ${decodedToken.email}!`);
-    }
-  });
-});
-
 app.get("/allUsers", async (req, res) => {
   try {
     const users = await User.findAll();

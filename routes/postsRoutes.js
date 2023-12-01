@@ -3,9 +3,11 @@ const router = express.Router();
 const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/posts");
+const Category = require("../models/category");
 const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
 
+const { invalidatedTokens } = require("./auth");
 router.post(
   "/addPosts",
   ImgUpload.uploadToGcs,
@@ -22,7 +24,8 @@ router.post(
       try {
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Decoded Token:", decodedToken);
-        if (invalidatedTokens.has(token)) {
+        // Check if token is invalidated before proceeding
+        if (invalidatedTokens && invalidatedTokens.has(token)) {
           return res
             .status(401)
             .json({ message: "Unauthorized: Token invalidated" });
@@ -51,6 +54,13 @@ router.post(
           .status(201)
           .json({ message: "Post created successfully", post: newPost });
       } catch (error) {
+        // Check if token is invalidated before returning Unauthorized
+        if (invalidatedTokens && invalidatedTokens.has(token)) {
+          return res
+            .status(401)
+            .json({ message: "Unauthorized: Token invalidated" });
+        }
+        console.error("Error creating post", error);
         return res.status(401).json({ message: "Unauthorized: Invalid token" });
       }
     } catch (error) {
