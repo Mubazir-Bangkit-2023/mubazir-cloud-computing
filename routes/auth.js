@@ -9,16 +9,12 @@ router.post("/register", async (req, res) => {
   try {
     const { fullname, no_hp, email, password } = req.body;
     if (!fullname || !no_hp || !email || !password) {
-      return res
-        .status(400)
-        .json({ message: "All fields must be filled!", data: null });
+      return res.status(400).json({ message: "All fields must be filled!" });
     }
 
     const existingUser = await User.findOne({ where: { email: email } });
     if (existingUser) {
-      return res
-        .status(400)
-        .json({ message: "Email already exists!", data: null });
+      return res.status(400).json({ message: "Email already exists!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -41,7 +37,7 @@ router.post("/register", async (req, res) => {
       });
     }
     console.error(error);
-    res.status(500).json({ message: "Server Error", data: null });
+    res.status(500).json({ message: "Server Error" });
   }
 });
 
@@ -50,9 +46,7 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
     if (!user || !(await bcrypt.compare(password, user.password))) {
-      res
-        .status(401)
-        .json({ message: "Invalid email or password", data: null });
+      res.status(401).json({ message: "Invalid email or password" });
       return;
     }
     const token = jwt.sign(
@@ -74,7 +68,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     console.error("Error during login", error);
-    res.status(500).json({ message: "Internal server error", data: null });
+    res.status(500).json({ message: "Internal server error" });
   }
 });
 
@@ -82,18 +76,14 @@ router.post("/logout", (req, res) => {
   const authHeader = req.headers["authorization"];
 
   if (!authHeader) {
-    return res
-      .status(401)
-      .json({ message: "Unauthorized: Missing token", data: null });
+    return res.status(401).json({ message: "Unauthorized: Missing token" });
   }
   const token = authHeader.split(" ")[1];
   try {
     invalidatedTokens.add(token);
-    res.json({ message: "Logout successful", data: null });
+    res.json({ message: "Logout successful" });
   } catch (err) {
-    res
-      .status(401)
-      .json({ message: "Unauthorized: Invalid token", data: null });
+    res.status(401).json({ message: "Unauthorized: Invalid token" });
   }
 });
 
