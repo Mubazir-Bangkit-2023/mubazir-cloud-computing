@@ -22,13 +22,24 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        
+
+- name: Debug Docker Auth
+  run: |
+    echo "Username: $DOCKER_USERNAME"
+    echo "Password: $DOCKER_PASSWORD"
+    echo "Registry: $DOCKER_REGISTRY"
+  env:
+    DOCKER_USERNAME: 'oauth2accesstoken'
+    DOCKER_PASSWORD: '${{ steps.auth.outputs.access_token }}'
+    DOCKER_REGISTRY: '${{ env.GAR_LOCATION }}-docker.pkg.dev'
+
       - name: Google Auth
         id: auth
         uses: 'google-github-actions/auth@v1'
         with:
           credentials_json: '${{ secrets.SATRIO }}'
 
+          
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
       # Authenticate Docker to Google Cloud Artifact Registry
