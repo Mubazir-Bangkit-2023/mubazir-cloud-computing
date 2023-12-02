@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const session = require("express-session");
+const cors = require("cors");
 const sequelize = require("./config/db");
 const jwt = require("jsonwebtoken");
 const User = require("./models/user");
@@ -25,6 +26,7 @@ app.use(bodyParser.json());
 app.use(
   session({ secret: sessionSecret, resave: true, saveUninitialized: true })
 );
+app.use(cors());
 
 app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
