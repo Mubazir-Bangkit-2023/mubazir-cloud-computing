@@ -25,9 +25,9 @@ jobs:
         
       - name: Google Auth
         id: auth
-        uses: 'google-github-actions/auth@v2'
+        uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: '${{ secrets.MUBAZIR }}'
+          credentials_json: '${{ secrets.CREDENTIALS.JSON }}'
 
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
