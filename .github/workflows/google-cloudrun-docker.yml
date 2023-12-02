@@ -67,9 +67,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      #NOTE: Alternative option - authentication via credentials json
-       - name: Google Auth
+        
+         name: Google Auth
          id: auth
          uses: 'google-github-actions/auth@v4'
          with:
