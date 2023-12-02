@@ -27,7 +27,7 @@ jobs:
         id: auth
         uses: 'google-github-actions/auth@v1'
         with:
-          credentials_json: '${{ secrets.CREDENTIALS.JSON }}'
+          credentials_json: '${{ secrets.SATRIO }}'
 
       # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
 
