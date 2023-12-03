@@ -11,7 +11,7 @@ env:
   REGION: asia-southeast2
 
 jobs:
-  deploy:
+  build_and_deploy:
     # Add 'id-token' with the intended permissions for workload identity federation
     permissions:
       contents: 'read'
@@ -29,6 +29,12 @@ jobs:
         with:
           credentials_json: '${{ secrets.SATRIO }}'
 
+      # BEGIN - Docker auth and build
+      - name: Build and Push Container
+        run: |
+          gcloud builds submit --config=cloudbuild.yaml .
+      # END - Docker auth and build
+
       - name: Deploy to Cloud Run
         id: deploy
         run: |
@@ -36,6 +42,6 @@ jobs:
             --image ${{ env.GAR_LOCATION }} \
             --quiet --platform managed --region ${{ env.REGION }} --project ${{ env.PROJECT_ID }} --format json
 
-      # If required, use the Cloud Run url output in later steps
+      # If required, use the Cloud Run URL output in later steps
       - name: Show Output
         run: echo ${{ steps.deploy.outputs.url }}
