@@ -9,7 +9,7 @@ env:
   PROJECT_ID: capstone-project-mubazirapp
   GAR_LOCATION: gcr.io/capstone-project-mubazirapp/capstone
   SERVICE: mubazir
-  REGION: us-southeast2
+  REGION: asia-southeast2
 
 jobs:
   deploy:
