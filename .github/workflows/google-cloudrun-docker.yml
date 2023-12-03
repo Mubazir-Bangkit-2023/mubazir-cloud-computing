@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: capstone-project-mubazirapp
-  GAR_LOCATION: gcr.io/capstone-project-mubazirapp/capstone/mubazir05
+  GAR_LOCATION: gcr.io/capstone-project-mubazirapp/capstone/mubazir05@sha256:5ca49a13a9d93e527571afd28521f8990fa1f0d2e91e7b31792c2a1b07aeb2c3
   SERVICE: mubazir
   REGION: asia-southeast2
 
