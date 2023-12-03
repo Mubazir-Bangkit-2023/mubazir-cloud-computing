@@ -29,13 +29,6 @@ jobs:
         with:
           credentials_json: '${{ secrets.SATRIO }}'
 
-      # BEGIN - Docker auth and build (NOTE: If you already have a container image, these Docker steps can be omitted)
-      - name: Build and Push Container
-        run: |
-          docker build -t "${{ env.GAR_LOCATION }}./
-          docker push ${{ env.GAR_LOCATION }}
-      # END - Docker auth and build
-
       - name: Deploy to Cloud Run
         id: deploy
         run: |
