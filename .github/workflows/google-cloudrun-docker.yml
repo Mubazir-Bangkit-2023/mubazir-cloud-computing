@@ -33,11 +33,6 @@ jobs:
     steps:
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05
-      - name: Authenticate with Google Cloud
-        uses: google-github-actions/auth@v1
-        with:
-          credentials_json: ${{ secrets.SATRIO }}
-        
       - name: Configure Docker to use GCR
         run: |
           echo ${{ secrets.SATRIO }} > gcr-key.json
