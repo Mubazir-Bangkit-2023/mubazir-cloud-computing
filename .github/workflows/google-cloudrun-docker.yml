@@ -29,9 +29,40 @@ jobs:
         with:
           credentials_json: '${{ secrets.SATRIO }}'
 
-      # BEGIN - Docker auth and build
+name: Docker Image CI
 
-      # END - Docker auth and build
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.SATRIO }}
+        
+    - name: Configure Docker to use GCR
+      run: |
+        echo ${{ secrets.SATRIO }} > gcr-key.json
+        gcloud auth activate-service-account --key-file=gcr-key.json
+        gcloud auth configure-docker gcr.io
+
+    - name: Tag and Push to GCR
+      run: |
+        IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05
+        docker tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05 $IMAGE_TAG
+        docker push $IMAGE_TAG
 
       - name: Deploy to Cloud Run
         id: deploy
