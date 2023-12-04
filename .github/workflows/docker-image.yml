@@ -20,6 +20,12 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.SATRIO }}
+    - name: Configure Docker to use GCR
+      run: |
+        echo ${{ secrets.GCR_SERVICE_KEY }} > gcr-key.json
+        gcloud auth activate-service-account --key-file=gcr-key.json
+        gcloud auth configure-docker gcr.io
+
     - name: Tag and Push to GCR
       run: |
         IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05
