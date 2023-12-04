@@ -30,13 +30,6 @@ jobs:
           credentials_json: '${{ secrets.SATRIO }}'
 
       # BEGIN - Docker auth and build
-      - name: Build and Push Container
-        run: |
-          steps:
-            - name: 'gcr.io/cloud-builders/docker'
-              args: ['build', '-t', 'gcr.io/capstone-project-mubazirapp/capstone/mubazir05', '.']
-            - name: 'gcr.io/cloud-builders/docker'
-              args: ['push', 'gcr.io/capstone-project-mubazirapp/capstone/mubazir05']
 
       # END - Docker auth and build
 
