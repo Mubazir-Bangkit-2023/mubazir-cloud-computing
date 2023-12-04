@@ -17,7 +17,6 @@ env:
   PORT: 80
   DB_SOCKET_PATH: cloudsql/capstone-project-mubazirapp:asia-southeast2:mubazi
   SECRET_KEY : 9i87uy654o20p284k
-  PROJECT_ID: capstone-project-mubazirapp
   BUCKET_NAME: mubazir
 
 jobs:
