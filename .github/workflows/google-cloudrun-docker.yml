@@ -35,8 +35,8 @@ jobs:
           steps:
             - name: 'gcr.io/cloud-builders/docker'
               args: ['build', '-t', 'gcr.io/capstone-project-mubazirapp/capstone/mubazir05', '.']
-            - images: ['gcr.io/capstone-project-mubazirapp/capstone/mubazir05']
-            - shell: /usr/bin/bash -e ***0***
+            - name: 'gcr.io/cloud-builders/docker'
+              args: ['push', 'gcr.io/capstone-project-mubazirapp/capstone/mubazir05']
 
       # END - Docker auth and build
 
