@@ -38,7 +38,7 @@ jobs:
           context: .
           push: true
           no-cache: true
-          tags: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
+          tags: gcr.io${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
         run: |
