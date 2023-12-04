@@ -44,6 +44,6 @@ jobs:
         run: |
           gcloud run deploy ${{ env.SERVICE }} \
             --image gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest \
-            --region ${{ env.REGION }} \
+            --region ${{ process.env.REGION }} \
             --platform managed \
             --allow-unauthenticated
