@@ -15,13 +15,13 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s)
+      run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05
     - name: Authenticate with Google Cloud
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.SATRIO }}
     - name: Tag and Push to GCR
       run: |
-        IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s)
-        docker tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s) $IMAGE_TAG
+        IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05
+        docker tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05 $IMAGE_TAG
         docker push $IMAGE_TAG
