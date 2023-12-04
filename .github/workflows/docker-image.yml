@@ -20,9 +20,6 @@ jobs:
       uses: google-github-actions/auth@v1
       with:
         credentials_json: ${{ secrets.SATRIO }}
-    - name: Configure Docker to use GCR
-      run: |
-        echo ${{ secrets.SATRIO }} | docker login -u _json_key --password-stdin https://gcr.io
     - name: Tag and Push to GCR
       run: |
         IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s)
