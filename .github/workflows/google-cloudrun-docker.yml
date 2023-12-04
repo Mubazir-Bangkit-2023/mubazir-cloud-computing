@@ -24,7 +24,7 @@ jobs:
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v0.2.1
         with:
-          project_id: ${{ secrets.ENV.PROJECT_ID }}
+          project_id: ${{ secrets.PROJECT_ID }}
           service_account_key: ${{ secrets.SATRIO }}
           export_default_credentials: true
 
@@ -34,12 +34,12 @@ jobs:
           context: .
           push: true
           no-cache: true
-          tags: gcr.io${{ secrets.ENV.PROJECT_ID }}/${{ secrets.ENV.IMAGE_NAME }}:latest
+          tags: gcr.io${{ secrets.PROJECT_ID }}/${{ secrets.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy ${{ secrets.ENV.SERVICE }} \
-            --image gcr.io/${{ secrets.ENV.PROJECT_ID }}/${{ secrets.ENV.IMAGE_NAME }}:latest \
-            --region ${{ secrets.ENV.REGION }} \
+          gcloud run deploy ${{ secrets.SERVICE }} \
+            --image gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.IMAGE_NAME }}:latest \
+            --region ${{ secrets.REGION }} \
             --platform managed \
             --allow-unauthenticated
