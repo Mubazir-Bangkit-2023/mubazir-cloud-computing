@@ -3,34 +3,26 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const multer = require("multer");
 
-// Adjust the path to your service account key
 const pathKey = path.resolve("./serviceaccounts.json");
 
-// Create a new Storage instance
 const gcs = new Storage({
-  projectId: process.env.PROJECT_ID,
+  projectId: process.ENV.PROJECT_ID,
   keyFilename: pathKey,
 });
 
-// Adjust the bucket name based on your configuration
-const bucketName = process.env.BUCKET_NAME;
+const bucketName = process.ENV.BUCKET_NAME;
 const bucket = gcs.bucket(bucketName);
 
-// Function to generate public URL for a file
 function getPublicUrl(filename) {
   return `https://storage.googleapis.com/${bucketName}/${filename}`;
 }
 
 let ImgUpload = {};
 
-// Set up Multer for handling file uploads
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-// Middleware to handle single file upload
 ImgUpload.uploadToGcs = upload.single("image");
-
-// Middleware to handle file upload to Google Cloud Storage
 ImgUpload.handleUpload = (req, res, next) => {
   if (!req.file) return next();
 
