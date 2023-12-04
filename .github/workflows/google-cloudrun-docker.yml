@@ -9,6 +9,15 @@ env:
   IMAGE_NAME: gcr.io/capstone-project-mubazirapp/capstone/mubazir05
   SERVICE: ci
   REGION: asia-southeast2
+  DB_NAME: mubazir_db
+  DB_USER: root
+  DB_PASSWORD: 123
+  DB_HOST: 34.101.93.150
+  DB_DIALECT: mysql
+  PORT: 80
+  DB_SOCKET_PATH: cloudsql/capstone-project-mubazirapp:asia-southeast2:mubazi
+  SECRET_KEY : 9i87uy654o20p284k
+  BUCKET_NAME: mubazir
 
 jobs:
   build_and_deploy:
@@ -27,20 +36,22 @@ jobs:
           username: _json_key
           password: ${{ secrets.SATRIO }}
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          no-cache: true
-          tags: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
-
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v0.2.1
         with:
           project_id: ${{ env.PROJECT_ID }}
           service_account_key: ${{ secrets.SATRIO }}
           export_default_credentials: true
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          no-cache: true
+          build-args: |
+            VAR1=${{ steps.secret.outputs.SECRET_VALUE }}
+          tags: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
         run: |
