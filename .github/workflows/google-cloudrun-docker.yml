@@ -34,9 +34,10 @@ jobs:
         run: |
           steps:
             - name: 'gcr.io/cloud-builders/docker'
-              args: ['build', '-t', ${{ env.GAR_LOCATION }}, '.']
-          images:
-            - ${{ env.GAR_LOCATION }}
+              args: ['build', '-t', 'gcr.io/capstone-project-mubazirapp/capstone/mubazir05', '.']
+            - images: ['gcr.io/capstone-project-mubazirapp/capstone/mubazir05']
+            - shell: /usr/bin/bash -e ***0***
+
       # END - Docker auth and build
 
       - name: Deploy to Cloud Run
