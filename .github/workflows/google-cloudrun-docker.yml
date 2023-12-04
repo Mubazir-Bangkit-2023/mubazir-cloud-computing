@@ -6,7 +6,7 @@ on:
 
 env:
   PROJECT_ID: capstone-project-mubazirapp
-  IMAGE_NAME: gcr.io/capstone-project-mubazirapp/capstone/mubazir05:latest
+  IMAGE_NAME: gcr.io/capstone-project-mubazirapp/capstone/mubazir05
   SERVICE: ci
   REGION: asia-southeast2
 
