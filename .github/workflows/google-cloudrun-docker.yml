@@ -5,19 +5,8 @@ on:
     branches: [ "master" ]
 
 env:
-  PROJECT_ID: capstone-project-mubazirapp
+  SERVICE : ci
   IMAGE_NAME: gcr.io/capstone-project-mubazirapp/capstone/mubazir05
-  SERVICE: ci
-  REGION: asia-southeast2
-  DB_NAME: mubazir_db
-  DB_USER: root
-  DB_PASSWORD: 123
-  DB_HOST: 34.101.93.150
-  DB_DIALECT: mysql
-  PORT: 80
-  DB_SOCKET_PATH: cloudsql/capstone-project-mubazirapp:asia-southeast2:mubazi
-  SECRET_KEY : 9i87uy654o20p284k
-  BUCKET_NAME: mubazir
 
 jobs:
   build_and_deploy:
