@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s)
+    - name: Authenticate with Google Cloud
+      uses: google-github-actions/auth@v1
+      with:
+        credentials_json: ${{ secrets.SATRIO }}
+    - name: Configure Docker to use GCR
+      run: |
+        echo ${{ secrets.SATRIO }} | docker login -u _json_key --password-stdin https://gcr.io
+    - name: Tag and Push to GCR
+      run: |
+        IMAGE_TAG=gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s)
+        docker tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05:$(date +%s) $IMAGE_TAG
+        docker push $IMAGE_TAG
