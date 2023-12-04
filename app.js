@@ -10,8 +10,8 @@ const postsRoutes = require("./routes/postsRoutes");
 const CategoriesRoutes = require("./routes/categoryRoutes");
 
 const app = express();
-const port = process.ENV.PORT;
-const sessionSecret = process.ENV.SESSION_SECRET;
+const port = process.env.PORT;
+const sessionSecret = process.env.SESSION_SECRET;
 
 sequelize
   .sync()
