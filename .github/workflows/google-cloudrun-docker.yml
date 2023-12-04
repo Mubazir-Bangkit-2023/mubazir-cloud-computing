@@ -49,3 +49,4 @@ jobs:
             --region ${{ env.REGION }} \
             --platform managed \
             --allow-unauthenticated
+
