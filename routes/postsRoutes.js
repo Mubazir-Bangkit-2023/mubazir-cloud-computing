@@ -22,7 +22,7 @@ router.post(
         return res.status(401).json({ message: "Unauthorized: Missing token" });
       }
       try {
-        const decodedToken = jwt.verify(token, process.ENV.SECRET_KEY);
+        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Decoded Token:", decodedToken);
         // Check if token is invalidated before proceeding
         if (invalidatedTokens && invalidatedTokens.has(token)) {
@@ -98,7 +98,7 @@ router.put("/updatePost/:id", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.ENV.SECRET_KEY);
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     console.log("Decoded Token:", decodedToken);
 
     const updatedPost = await Post.update(
@@ -136,7 +136,7 @@ router.delete("/deletePost/:id", async (req, res) => {
   try {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.ENV.SECRET_KEY);
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
     console.log("Decoded Token:", decodedToken);
 
     const deletedPost = await Post.destroy({

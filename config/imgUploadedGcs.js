@@ -6,11 +6,11 @@ const multer = require("multer");
 const pathKey = path.resolve("./serviceaccounts.json");
 
 const gcs = new Storage({
-  projectId: process.ENV.PROJECT_ID,
+  projectId: process.env.PROJECT_ID,
   keyFilename: pathKey,
 });
 
-const bucketName = process.ENV.BUCKET_NAME;
+const bucketName = process.env.BUCKET_NAME;
 const bucket = gcs.bucket(bucketName);
 
 function getPublicUrl(filename) {
