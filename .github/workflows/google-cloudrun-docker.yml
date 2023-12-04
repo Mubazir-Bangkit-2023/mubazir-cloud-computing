@@ -29,8 +29,7 @@ jobs:
         with:
           credentials_json: '${{ secrets.SATRIO }}'
 
-  push_docker:
-    steps:
+ 
       - name: Build the Docker image
         run: docker build . --file Dockerfile --tag gcr.io/capstone-project-mubazirapp/capstone/mubazir05
       - name: Configure Docker to use GCR
