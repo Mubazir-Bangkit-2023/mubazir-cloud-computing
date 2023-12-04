@@ -6,7 +6,7 @@ on:
 
 env:
   SERVICE : ci
-  IMAGE_NAME: gcr.io/capstone-project-mubazirapp/capstone/mubazir05
+  IMAGE_NAME: capstone-project-mubazirapp/capstone/mubazir05
 
 jobs:
   build_and_deploy:
@@ -38,8 +38,6 @@ jobs:
           context: .
           push: true
           no-cache: true
-          build-args: |
-            VAR1=${{ steps.secret.outputs.SECRET_VALUE }}
           tags: gcr.io/${{ env.PROJECT_ID }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
