@@ -32,7 +32,11 @@ jobs:
       # BEGIN - Docker auth and build
       - name: Build and Push Container
         run: |
-          gcloud builds submit --config=cloudbuild.yaml .
+          steps:
+            - name: 'gcr.io/cloud-builders/docker'
+              args: ['build', '-t', 'gcr.io/$PROJECT_ID/capstone/mubazir05:$SHORT_SHA', '.']
+          images:
+            - 'gcr.io/$PROJECT_ID/capstone/mubazir05:$SHORT_SHA'
       # END - Docker auth and build
 
       - name: Deploy to Cloud Run
