@@ -24,7 +24,6 @@ router.post(
       try {
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Decoded Token:", decodedToken);
-        // Check if token is invalidated before proceeding
         if (invalidatedTokens && invalidatedTokens.has(token)) {
           return res
             .status(401)
@@ -54,7 +53,6 @@ router.post(
           .status(201)
           .json({ message: "Post created successfully", post: newPost });
       } catch (error) {
-        // Check if token is invalidated before returning Unauthorized
         if (invalidatedTokens && invalidatedTokens.has(token)) {
           return res
             .status(401)
