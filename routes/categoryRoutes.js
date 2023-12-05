@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Category = require("../models/category"); // Adjust the import based on your file structure
+const Category = require("../models/category");
 const { v4: uuidv4 } = require("uuid");
 
 router.post("/add", async (req, res) => {
