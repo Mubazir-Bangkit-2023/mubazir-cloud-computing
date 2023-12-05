@@ -1,1 +1,0 @@
-# mubazir-cloud-computing
