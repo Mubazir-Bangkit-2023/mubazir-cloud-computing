@@ -11,7 +11,7 @@ const Posts = sequelize.define("Post", {
     allowNull: false,
     defaultValue: () => uuidv4(),
   },
-  name: {
+  title: {
     type: DataTypes.STRING,
     allowNull: false,
   },
@@ -23,9 +23,18 @@ const Posts = sequelize.define("Post", {
     type: DataTypes.INTEGER,
     allowNull: false,
   },
-  img_url: {
+  imgUrl: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  freshness: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  pickupTime: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    time: true,
   },
   lat: {
     type: DataTypes.FLOAT,
@@ -35,7 +44,7 @@ const Posts = sequelize.define("Post", {
     type: DataTypes.FLOAT,
     allowNull: true,
   },
-  id_cat: {
+  categoryId: {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
@@ -43,7 +52,7 @@ const Posts = sequelize.define("Post", {
       key: "id",
     },
   },
-  id_user: {
+  userId: {
     type: DataTypes.UUID,
     allowNull: false,
     references: {
@@ -51,7 +60,7 @@ const Posts = sequelize.define("Post", {
       key: "id",
     },
   },
-  is_available: {
+  isAvailable: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true,
@@ -59,17 +68,17 @@ const Posts = sequelize.define("Post", {
 });
 
 Posts.belongsTo(User, {
-  foreignKey: "id_user",
+  foreignKey: "userId",
   constraints: false,
   foreignKeyConstraint: true,
 });
-User.hasMany(Posts, { foreignKey: "id_user" });
+User.hasMany(Posts, { foreignKey: "userId" });
 
 Posts.belongsTo(Category, {
-  foreignKey: "id_cat",
+  foreignKey: "categoryId",
   constraints: false,
   foreignKeyConstraint: true,
 });
-Category.hasMany(Posts, { foreignKey: "id_cat" });
+Category.hasMany(Posts, { foreignKey: "categoryId" });
 
 module.exports = Posts;
