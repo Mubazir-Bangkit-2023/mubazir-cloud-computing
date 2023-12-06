@@ -8,28 +8,46 @@ const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
 
 const { invalidatedTokens } = require("./auth");
+
 router.post(
   "/addPosts",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
-    const { name, description, price, lat, lon, id_cat, is_available } =
-      req.body;
+    const {
+      title,
+      description,
+      price,
+      lat,
+      lon,
+      freshness,
+      categoryId,
+      isAvailable,
+    } = req.body;
     try {
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
       if (!token) {
         return res.status(401).json({ message: "Unauthorized: Missing token" });
       }
+
       try {
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Decoded Token:", decodedToken);
+
+        if (!decodedToken.id) {
+          return res
+            .status(401)
+            .json({ message: "Unauthorized: User not logged in" });
+        }
+
         if (invalidatedTokens && invalidatedTokens.has(token)) {
           return res
             .status(401)
             .json({ message: "Unauthorized: Token invalidated" });
         }
-        const categoryExists = await Category.findByPk(id_cat);
+
+        const categoryExists = await Category.findByPk(categoryId);
         if (!categoryExists) {
           return res.status(404).json({ message: "Category not found" });
         }
@@ -39,15 +57,16 @@ router.post(
         }
         const newPost = await Post.create({
           id: uuidv4(),
-          name,
+          title,
           description,
           price,
-          img_url: imageUrl,
+          imgUrl: imageUrl,
+          freshness,
           lat,
           lon,
-          id_cat,
-          id_user: decodedToken.id,
-          is_available,
+          categoryId,
+          userId: decodedToken.id,
+          isAvailable,
         });
         res
           .status(201)
@@ -91,7 +110,8 @@ router.get("/latestPosts", async (req, res) => {
 });
 
 router.put("/updatePost/:id", async (req, res) => {
-  const { name, description, price, lat, lon, id_cat, is_available } = req.body;
+  const { title, description, price, lat, lon, id_cat, is_available } =
+    req.body;
 
   try {
     const authHeader = req.headers["authorization"];
