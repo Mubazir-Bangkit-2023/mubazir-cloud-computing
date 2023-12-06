@@ -10,7 +10,7 @@ const bcrypt = require("bcryptjs");
 const { invalidatedTokens } = require("./auth");
 
 router.post(
-  "/addPosts",
+  "/addFood",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
