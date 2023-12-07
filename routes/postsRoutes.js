@@ -28,7 +28,7 @@ router.post(
     } = req.body;
     try {
       const datetime = moment.unix(pickupTime);
-      const formatDateTime = datetime.format("YYY-MM-DD HH-mm-ss");
+      const formatDateTime = datetime.format("YYY-MM-DD HH-MM-SS");
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
       if (!token) {
