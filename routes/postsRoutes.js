@@ -28,7 +28,6 @@ router.post(
     } = req.body;
     try {
       const datetime = moment.unix(pickupTime);
-
       const formatDateTime = datetime.format("YYY-MM-DD HH-mm-ss");
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
@@ -92,7 +91,7 @@ router.post(
   }
 );
 
-router.get("/allPosts", async (req, res) => {
+router.get("/all", async (req, res) => {
   try {
     const allPosts = await Post.findAll();
     res.status(200).json({ posts: allPosts });
