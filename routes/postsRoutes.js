@@ -199,7 +199,7 @@ router.get("/getPost/:id", async (req, res) => {
   }
 });
 
-router.get("/postsByCategory/:id_cat", async (req, res) => {
+router.get("/postsByCategory/:categoryId", async (req, res) => {
   try {
     const id_cat = req.params.id_cat;
     const postsByCategory = await Post.findAll({
