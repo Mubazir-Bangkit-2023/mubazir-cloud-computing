@@ -31,7 +31,7 @@ app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
 app.use("/categories", CategoriesRoutes);
 
-app.get("/allUsers", async (req, res) => {
+app.get("/users", async (req, res) => {
   try {
     const users = await User.findAll();
     res.json(users);
