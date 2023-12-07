@@ -27,8 +27,6 @@ router.post(
       isAvailable,
     } = req.body;
     try {
-      const datetime = moment.unix(pickupTime);
-      const formatDateTime = datetime.format("YYY-MM-DD HH-MM-SS");
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
       if (!token) {
@@ -57,6 +55,16 @@ router.post(
         if (req.file && req.file.cloudStoragePublicUrl) {
           imageUrl = req.file.cloudStoragePublicUrl;
         }
+
+        let formatDateTime;
+
+        try {
+          const datetime = moment.unix(pickupTime);
+          const formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+        } catch (error) {
+          console.error("Error converting pickupTime:", error);
+        }
+
         const newPost = await Post.create({
           id: uuidv4(),
           title,
