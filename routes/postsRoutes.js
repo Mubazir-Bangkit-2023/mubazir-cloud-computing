@@ -70,7 +70,7 @@ router.post(
           lon,
           categoryId,
           userId: decodedToken.id,
-          isAvailable,
+          isAvailable: isAvailable || true,
         });
         res
           .status(201)
