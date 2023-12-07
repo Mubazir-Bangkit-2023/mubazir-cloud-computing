@@ -53,10 +53,12 @@ router.post(
         if (req.file && req.file.cloudStoragePublicUrl) {
           imageUrl = req.file.cloudStoragePublicUrl;
         }
-        let formatDateTime;
+
+        let formatDateTime = "";
+
         try {
           const datetime = moment.unix(pickupTime);
-          const formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+          formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
         } catch (error) {
           console.error("Error converting pickupTime:", error);
         }
