@@ -44,7 +44,6 @@ router.post(
             .status(401)
             .json({ message: "Unauthorized: User not logged in" });
         }
-
         if (invalidatedTokens && invalidatedTokens.has(token)) {
           return res
             .status(401)
