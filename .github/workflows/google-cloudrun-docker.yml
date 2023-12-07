@@ -27,7 +27,7 @@ jobs:
 
       - name: Create serviceaccounts.json
         run: |
-          echo ${{ secrets.SATRIO }} >> serviceaccounts.json
+         echo "${{ secrets.SATRIO }}" > serviceaccounts.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
