@@ -32,11 +32,9 @@ router.post(
       if (!token) {
         return res.status(401).json({ message: "Unauthorized: Missing token" });
       }
-
       try {
         const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
         console.log("Decoded Token:", decodedToken);
-
         if (!decodedToken.id) {
           return res
             .status(401)
@@ -55,9 +53,7 @@ router.post(
         if (req.file && req.file.cloudStoragePublicUrl) {
           imageUrl = req.file.cloudStoragePublicUrl;
         }
-
         let formatDateTime;
-
         try {
           const datetime = moment.unix(pickupTime);
           const formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
