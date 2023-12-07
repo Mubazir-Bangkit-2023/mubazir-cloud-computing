@@ -6,11 +6,12 @@ const Post = require("../models/posts");
 const Category = require("../models/category");
 const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
+const moment = require("moment");
 
 const { invalidatedTokens } = require("./auth");
 
 router.post(
-  "/addFood",
+  "/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
@@ -26,6 +27,9 @@ router.post(
       isAvailable,
     } = req.body;
     try {
+      const datetime = moment.unix(pickupTime);
+
+      const formatDateTime = datetime.format("YYY-MM-DD HH-mm-ss");
       const authHeader = req.headers["authorization"];
       const token = authHeader && authHeader.split(" ")[1];
       if (!token) {
@@ -47,7 +51,6 @@ router.post(
             .status(401)
             .json({ message: "Unauthorized: Token invalidated" });
         }
-
         const categoryExists = await Category.findByPk(categoryId);
         if (!categoryExists) {
           return res.status(404).json({ message: "Category not found" });
@@ -61,7 +64,7 @@ router.post(
           title,
           description,
           price,
-          pickupTime,
+          pickupTime: formatDateTime,
           imgUrl: imageUrl,
           freshness,
           lat,
