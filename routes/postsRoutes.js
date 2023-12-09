@@ -8,14 +8,40 @@ const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
 const { Op } = require("sequelize");
+const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");
 
 //Get Routes
 router.get("/", async (req, res) => {
   try {
-    const allPosts = await Post.findAll();
-    res.status(200).json({ posts: allPosts });
+    const { page = 1, limit = 10, lat, lon } = req.query;
+    const offset = (page - 1) * limit;
+    if (!lat || !lon) {
+      return res
+        .status(400)
+        .json({ message: "Missing latitude or longitude parameters" });
+    }
+
+    const userLocation = {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    };
+    const postsWithDistance = await Post.findAll();
+    const postsWithDistanceAndDistance = postsWithDistance.map((post) => {
+      const postLocation = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      return { ...post.dataValues, distance };
+    });
+    const sortedPosts = postsWithDistanceAndDistance.sort(
+      (a, b) => a.distance - b.distance
+    );
+    const paginatedPosts = sortedPosts.slice(offset, offset + parseInt(limit));
+
+    res.status(200).json({ posts: paginatedPosts });
   } catch (error) {
     console.error("Error fetching posts", error);
     res.status(500).json({ message: "Internal server error" });
@@ -65,15 +91,13 @@ router.get("/Category/:categoryId", async (req, res) => {
 router.get("/filterByTitle", async (req, res) => {
   try {
     const titleFilter = req.query.title;
-
     if (!titleFilter) {
       return res.status(400).json({ message: "Missing title parameter" });
     }
-
     const filteredPosts = await Post.findAll({
       where: {
         title: {
-          [Op.iLike]: `%${titleFilter}%`, // Gunakan Op.iLike untuk pencarian case-insensitive
+          [Op.iLike]: `%${titleFilter}%`,
         },
       },
     });
@@ -87,6 +111,147 @@ router.get("/filterByTitle", async (req, res) => {
     res.status(200).json({ posts: filteredPosts });
   } catch (error) {
     console.error("Error fetching posts by title", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/recommendation/nearby", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res
+        .status(400)
+        .json({ message: "Missing latitude or longitude parameters" });
+    }
+    const userLocation = {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    };
+    const allPosts = await Post.findAll();
+    const postsWithDistance = allPosts.map((post) => {
+      const postLocation = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      return { ...post.dataValues, distance };
+    });
+    const sortedPosts = postsWithDistance.sort(
+      (a, b) => a.distance - b.distance
+    );
+    res.status(200).json({ posts: sortedPosts });
+  } catch (error) {
+    console.error("Error fetching nearby recommendations", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/recommendation/restaurant", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res
+        .status(400)
+        .json({ message: "Missing latitude or longitude parameters" });
+    }
+
+    const userLocation = {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    };
+
+    const restaurantPosts = await Post.findAll({
+      where: {
+        categoryId: 1,
+      },
+    });
+    const restaurantWithDistance = restaurantPosts.map((post) => {
+      const postLocation = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      const latDifference = Math.abs(
+        userLocation.latitude - postLocation.latitude
+      );
+      const lonDifference = Math.abs(
+        userLocation.longitude - postLocation.longitude
+      );
+
+      return {
+        ...post.dataValues,
+        distance,
+        userLat: userLocation.latitude,
+        userLon: userLocation.longitude,
+        postLat: postLocation.latitude,
+        postLon: postLocation.longitude,
+        latDifference,
+        lonDifference,
+      };
+    });
+    const sortedRestaurants = restaurantWithDistance.sort(
+      (a, b) => a.distance - b.distance
+    );
+
+    res.status(200).json({ restaurants: sortedRestaurants });
+  } catch (error) {
+    console.error("Error fetching nearby restaurant recommendations", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/recommendation/homefood", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+
+    if (!lat || !lon) {
+      return res
+        .status(400)
+        .json({ message: "Missing latitude or longitude parameters" });
+    }
+
+    const userLocation = {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    };
+
+    const homefoodPosts = await Post.findAll({
+      where: {
+        categoryId: 2,
+      },
+    });
+    const homefoodWithDistance = homefoodPosts.map((post) => {
+      const postLocation = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      const latDifference = Math.abs(
+        userLocation.latitude - postLocation.latitude
+      );
+      const lonDifference = Math.abs(
+        userLocation.longitude - postLocation.longitude
+      );
+
+      return {
+        ...post.dataValues,
+        distance,
+        userLat: userLocation.latitude,
+        userLon: userLocation.longitude,
+        postLat: postLocation.latitude,
+        postLon: postLocation.longitude,
+        latDifference,
+        lonDifference,
+      };
+    });
+    const sortedHomefood = homefoodWithDistance.sort(
+      (a, b) => a.distance - b.distance
+    );
+
+    res.status(200).json({ restaurants: sortedHomefood });
+  } catch (error) {
+    console.error("Error fetching nearby homefood recommendations", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
