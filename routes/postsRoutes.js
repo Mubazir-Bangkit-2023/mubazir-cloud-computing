@@ -21,7 +21,6 @@ router.get("/", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-
     const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
@@ -39,7 +38,6 @@ router.get("/", async (req, res) => {
       (a, b) => a.distance - b.distance
     );
     const paginatedPosts = sortedPosts.slice(offset, offset + parseInt(limit));
-
     res.status(200).json({ posts: paginatedPosts });
   } catch (error) {
     console.error("Error fetching posts", error);
@@ -138,7 +136,8 @@ router.get("/recommendation/nearby", async (req, res) => {
     const sortedPosts = postsWithDistance.sort(
       (a, b) => a.distance - b.distance
     );
-    res.status(200).json({ posts: sortedPosts });
+    const nearbyPosts = sortedPosts.slice(0, 5);
+    res.status(200).json({ posts: nearbyPosts });
   } catch (error) {
     console.error("Error fetching nearby recommendations", error);
     res.status(500).json({ message: "Internal server error" });
@@ -193,7 +192,8 @@ router.get("/recommendation/restaurant", async (req, res) => {
       (a, b) => a.distance - b.distance
     );
 
-    res.status(200).json({ restaurants: sortedRestaurants });
+    const restaurantPost = sortedRestaurants.slice(0, 5);
+    res.status(200).json({ restaurants: restaurantPost });
   } catch (error) {
     console.error("Error fetching nearby restaurant recommendations", error);
     res.status(500).json({ message: "Internal server error" });
@@ -203,18 +203,15 @@ router.get("/recommendation/restaurant", async (req, res) => {
 router.get("/recommendation/homefood", async (req, res) => {
   try {
     const { lat, lon } = req.query;
-
     if (!lat || !lon) {
       return res
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-
     const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
-
     const homefoodPosts = await Post.findAll({
       where: {
         categoryId: 2,
@@ -232,7 +229,6 @@ router.get("/recommendation/homefood", async (req, res) => {
       const lonDifference = Math.abs(
         userLocation.longitude - postLocation.longitude
       );
-
       return {
         ...post.dataValues,
         distance,
@@ -247,8 +243,59 @@ router.get("/recommendation/homefood", async (req, res) => {
     const sortedHomefood = homefoodWithDistance.sort(
       (a, b) => a.distance - b.distance
     );
+    const homefoodPost = sortedHomefood.slice(0, 5);
+    res.status(200).json({ homefood: homefoodPost });
+  } catch (error) {
+    console.error("Error fetching nearby homefood recommendations", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
-    res.status(200).json({ restaurants: sortedHomefood });
+router.get("/recommendation/rawIngredients", async (req, res) => {
+  try {
+    const { lat, lon } = req.query;
+    if (!lat || !lon) {
+      return res
+        .status(400)
+        .json({ message: "Missing latitude or longitude parameters" });
+    }
+    const userLocation = {
+      latitude: parseFloat(lat),
+      longitude: parseFloat(lon),
+    };
+    const ingredientsPosts = await Post.findAll({
+      where: {
+        categoryId: 3,
+      },
+    });
+    const ingredientsWithDistance = ingredientsPosts.map((post) => {
+      const postLocation = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      const latDifference = Math.abs(
+        userLocation.latitude - postLocation.latitude
+      );
+      const lonDifference = Math.abs(
+        userLocation.longitude - postLocation.longitude
+      );
+      return {
+        ...post.dataValues,
+        distance,
+        userLat: userLocation.latitude,
+        userLon: userLocation.longitude,
+        postLat: postLocation.latitude,
+        postLon: postLocation.longitude,
+        latDifference,
+        lonDifference,
+      };
+    });
+    const sortedIngredients = ingredientsWithDistance.sort(
+      (a, b) => a.distance - b.distance
+    );
+    const ingredientsPost = sortedIngredients.slice(0, 5);
+    res.status(200).json({ rawIngredients: ingredientsPost });
   } catch (error) {
     console.error("Error fetching nearby homefood recommendations", error);
     res.status(500).json({ message: "Internal server error" });
