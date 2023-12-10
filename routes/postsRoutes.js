@@ -7,7 +7,6 @@ const Category = require("../models/category");
 const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
-const { Op } = require("sequelize");
 const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");

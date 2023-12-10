@@ -5,8 +5,8 @@ const { v4: uuidv4 } = require("uuid");
 
 router.post("/add", async (req, res) => {
   try {
-    const { category } = req.body;
-    const newCategory = await Category.create({ category });
+    const { id, category } = req.body;
+    const newCategory = await Category.create({ id, category });
     res.status(201).json({
       message: "Category created successfully",
       category: newCategory,
