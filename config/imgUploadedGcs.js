@@ -2,7 +2,7 @@ const { Storage } = require("@google-cloud/storage");
 const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const multer = require("multer");
-const pathKey = path.resolve("./serviceaccounts.json");
+const pathKey = process.env.SERVICE_ACCOUNT_PATH || path.resolve("./serviceaccounts.json");
 
 const gcs = new Storage({
   projectId: process.env.PROJECT_ID,
