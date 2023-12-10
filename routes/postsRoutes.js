@@ -11,7 +11,7 @@ const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");
 
-//Get Routes
+//Get Routes posts
 router.get("/", async (req, res) => {
   try {
     const { page = 1, limit = 10, lat, lon } = req.query;
