@@ -3,7 +3,9 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const multer = require("multer");
 
-const pathKey = path.resolve("./serviceaccounts.json");
+const path= require("path");
+
+const pathKey = path.resolve(__dirname, '../../serviceaccounts.json');
 
 const gcs = new Storage({
   projectId: process.env.PROJECT_ID,
