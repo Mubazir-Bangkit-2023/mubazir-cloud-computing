@@ -33,7 +33,9 @@ jobs:
           echo REGION=${{ secrets.REGION }} >> .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
         
-
+      - name: create credentials.json
+        run: |
+          echo -e "${{secrets.SATRIO}}" >> /app/credentials.json
 
 
       - name: Set up Docker Buildx
