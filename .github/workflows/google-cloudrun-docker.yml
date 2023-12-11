@@ -24,10 +24,11 @@ jobs:
           echo PROJECT_ID=${{ secrets.PROJECT_ID }} >> .env
           echo REGION=${{ secrets.REGION }} >> .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
+        
 
-      - name: Create serviceaccounts.json
+      - name: Create credentials.json
         run: |
-         echo -e "${{ secrets.SATRIO }}" >> serviceaccounts.json
+         echo -e '${{ secrets.SATRIO }}' >> ./config/credentials.json
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
