@@ -2,7 +2,7 @@ FROM node:18.18.2
 
 WORKDIR /app
 
-COPY /app/credentials.json
+COPY /app/credentials.json ./config/credentials.json
 
 COPY package*.json ./
 
