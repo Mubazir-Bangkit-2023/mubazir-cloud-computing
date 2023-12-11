@@ -69,11 +69,21 @@ router.get("/latestPosts", async (req, res) => {
 
 router.get("/postsById/:id", async (req, res) => {
   try {
-    const post = await Post.findByPk(req.params.post_id);
+    const post = await Post.findByPk(req.params.id);
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-    res.status(200).json({ post });
+    const unixPickupTime = moment(post.pickupTime).unix();
+    const unixCreatedAt = moment(post.createdAt).unix();
+    const unixUpdatedAt = moment(post.updatedAt).unix();
+    const responsePost = {
+      ...post.toJSON(),
+      pickupTime: unixPickupTime,
+      createdAt: unixCreatedAt,
+      updatedAt: unixUpdatedAt,
+    };
+
+    res.status(200).json({ post: responsePost });
   } catch (error) {
     console.error("Error fetching post", error);
     res.status(500).json({ message: "Internal server error" });
@@ -358,10 +368,11 @@ router.post(
         }
 
         let formatDateTime = "";
-
+        let numericDateTime = 0;
         try {
           const datetime = moment.unix(pickupTime);
           formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+          numericDateTime = datetime.unix();
         } catch (error) {
           console.error("Error converting pickupTime:", error);
         }
