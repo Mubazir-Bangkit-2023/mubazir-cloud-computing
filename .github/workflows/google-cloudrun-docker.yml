@@ -11,6 +11,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
+ 
+      - name: Set Up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with: 
+            project_id: capstone-project-mubazirapp
+            service_account_key: ${{secrets.SATRIO}}
+
+
       - name: Create .env file
         run: |
           echo PORT=${{ secrets.PORT }} >> .env
