@@ -35,7 +35,7 @@ jobs:
         
       - name: create credentials.json
         run: |
-          echo -e "${{secrets.SATRIO}}" >> /app/credentials.json
+          echo -e "${{secrets.SATRIO}}" >> credentials.json
 
 
       - name: Set up Docker Buildx
