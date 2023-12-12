@@ -22,24 +22,24 @@ router.get("/", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const userLocation = {
+    const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
-    const postsWithDistance = await Post.findAll();
-    const postsWithDistanceAndDistance = postsWithDistance.map((post) => {
-      const postLocation = {
+    const WithDistance = await Post.findAll();
+    const WithDistanceAndDistance = WithDistance.map((post) => {
+      const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      const distance = geolib.getDistance(location_user, locationPosts, 1);
       return { ...post.dataValues, distance };
     });
-    const sortedPosts = postsWithDistanceAndDistance.sort(
+    const sortPosts = WithDistanceAndDistance.sort(
       (a, b) => a.distance - b.distance
     );
-    const paginatedPosts = sortedPosts.slice(offset, offset + parseInt(limit));
-    res.status(200).json({ posts: paginatedPosts });
+    const paginationPage = sortPosts.slice(offset, offset + parseInt(limit));
+    res.status(200).json({ posts: paginationPage });
   } catch (error) {
     console.error("Error fetching posts", error);
     res.status(500).json({ message: "Internal server error" });
@@ -56,7 +56,7 @@ router.get("/", async (req, res) => {
 //   }
 // });
 
-router.get("/latestPosts", async (req, res) => {
+router.get("/latest", async (req, res) => {
   try {
     const latestPosts = await Post.findAll({
       order: [["createdAt", "DESC"]],
@@ -68,7 +68,7 @@ router.get("/latestPosts", async (req, res) => {
   }
 });
 
-router.get("/postsById/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
     const post = await Post.findByPk(req.params.id, {
       include: [
@@ -151,23 +151,21 @@ router.get("/recommendation/nearby", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const userLocation = {
+    const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
     const allPosts = await Post.findAll();
-    const postsWithDistance = allPosts.map((post) => {
-      const postLocation = {
+    const WithDistance = allPosts.map((post) => {
+      const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(userLocation, postLocation, 1);
+      const distance = geolib.getDistance(location_user, locationPosts, 1);
       return { ...post.dataValues, distance };
     });
-    const sortedPosts = postsWithDistance.sort(
-      (a, b) => a.distance - b.distance
-    );
-    const nearbyPosts = sortedPosts.slice(0, 5);
+    const sortPosts = WithDistance.sort((a, b) => a.distance - b.distance);
+    const nearbyPosts = sortPosts.slice(0, 5);
     res.status(200).json({ posts: nearbyPosts });
   } catch (error) {
     console.error("Error fetching nearby recommendations", error);
@@ -185,7 +183,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
         .json({ message: "Missing latitude or longitude parameters" });
     }
 
-    const userLocation = {
+    const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -196,27 +194,27 @@ router.get("/recommendation/restaurant", async (req, res) => {
       },
     });
     const restaurantWithDistance = restaurantPosts.map((post) => {
-      const postLocation = {
+      const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(userLocation, postLocation, 1);
-      const latDifference = Math.abs(
-        userLocation.latitude - postLocation.latitude
+      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const differenceLat = Math.abs(
+        location_user.latitude - locationPosts.latitude
       );
-      const lonDifference = Math.abs(
-        userLocation.longitude - postLocation.longitude
+      const differenceLon = Math.abs(
+        location_user.longitude - locationPosts.longitude
       );
 
       return {
         ...post.dataValues,
         distance,
-        userLat: userLocation.latitude,
-        userLon: userLocation.longitude,
-        postLat: postLocation.latitude,
-        postLon: postLocation.longitude,
-        latDifference,
-        lonDifference,
+        latUser: location_user.latitude,
+        userLon: location_user.longitude,
+        latPost: locationPosts.latitude,
+        lonPost: locationPosts.longitude,
+        differenceLat,
+        differenceLon,
       };
     });
     const sortedRestaurants = restaurantWithDistance.sort(
@@ -239,7 +237,7 @@ router.get("/recommendation/homefood", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const userLocation = {
+    const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -249,32 +247,32 @@ router.get("/recommendation/homefood", async (req, res) => {
       },
     });
     const homefoodWithDistance = homefoodPosts.map((post) => {
-      const postLocation = {
+      const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(userLocation, postLocation, 1);
-      const latDifference = Math.abs(
-        userLocation.latitude - postLocation.latitude
+      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const differenceLat = Math.abs(
+        location_user.latitude - locationPosts.latitude
       );
-      const lonDifference = Math.abs(
-        userLocation.longitude - postLocation.longitude
+      const differenceLon = Math.abs(
+        location_user.longitude - locationPosts.longitude
       );
       return {
         ...post.dataValues,
         distance,
-        userLat: userLocation.latitude,
-        userLon: userLocation.longitude,
-        postLat: postLocation.latitude,
-        postLon: postLocation.longitude,
-        latDifference,
-        lonDifference,
+        latUser: location_user.latitude,
+        lonUser: location_user.longitude,
+        latPost: locationPosts.latitude,
+        lonPost: locationPosts.longitude,
+        differenceLat,
+        differenceLon,
       };
     });
-    const sortedHomefood = homefoodWithDistance.sort(
+    const sortHomefood = homefoodWithDistance.sort(
       (a, b) => a.distance - b.distance
     );
-    const homefoodPost = sortedHomefood.slice(0, 5);
+    const homefoodPost = sortHomefood.slice(0, 5);
     res.status(200).json({ homefood: homefoodPost });
   } catch (error) {
     console.error("Error fetching nearby homefood recommendations", error);
@@ -290,7 +288,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const userLocation = {
+    const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -300,26 +298,26 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       },
     });
     const ingredientsWithDistance = ingredientsPosts.map((post) => {
-      const postLocation = {
+      const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(userLocation, postLocation, 1);
-      const latDifference = Math.abs(
-        userLocation.latitude - postLocation.latitude
+      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const differenceLat = Math.abs(
+        location_user.latitude - locationPosts.latitude
       );
-      const lonDifference = Math.abs(
-        userLocation.longitude - postLocation.longitude
+      const differenceLon = Math.abs(
+        location_user.longitude - locationPosts.longitude
       );
       return {
         ...post.dataValues,
         distance,
-        userLat: userLocation.latitude,
-        userLon: userLocation.longitude,
-        postLat: postLocation.latitude,
-        postLon: postLocation.longitude,
-        latDifference,
-        lonDifference,
+        latUser: location_user.latitude,
+        lonUser: location_user.longitude,
+        latPost: locationPosts.latitude,
+        lonPost: locationPosts.longitude,
+        differenceLat,
+        differenceLon,
       };
     });
     const sortedIngredients = ingredientsWithDistance.sort(
