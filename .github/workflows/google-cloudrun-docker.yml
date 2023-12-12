@@ -16,7 +16,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0.2.0
         with: 
             project_id: capstone-project-mubazirapp
-            service_account_key: ${{secrets.SATRIO}}
+            service_account_key: ${{ secrets.SATRIO }}
 
 
       - name: Create .env file
@@ -35,7 +35,7 @@ jobs:
         
       - name: create credentials.json
         run: |
-          echo -e "${{secrets.SATRIO}}" >> credentials.json
+          echo -e "${{ secrets.SATRIO }}" >> credentials.json
 
 
       - name: Set up Docker Buildx
