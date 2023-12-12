@@ -2,6 +2,8 @@ FROM node:18.18.2
 
 WORKDIR /app
 
+COPY credentials.json ./config/credentials.json
+
 COPY package*.json ./
 
 RUN npm install
