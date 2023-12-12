@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require("uuid");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/posts");
 const Category = require("../models/category");
+const User = require("../models/user");
 const ImgUpload = require("../config/imgUploadedGcs");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
@@ -83,7 +84,25 @@ router.get("/postsById/:id", async (req, res) => {
       updatedAt: unixUpdatedAt,
     };
 
-    res.status(200).json({ post: responsePost });
+    const user = await User.findByPk(post.userId);
+    if (!user) {
+      return res.status(401).send("User not found");
+    }
+
+    const userInfo = {
+      id: user.id,
+      full_name: user.fullname,
+      email: user.email,
+      no_hp: user.no_hp,
+      photo_url: user.photo_url,
+    };
+
+    const combine = {
+      post: responsePost,
+      userInfo: userInfo,
+    };
+
+    res.status(200).json(combine);
   } catch (error) {
     console.error("Error fetching post", error);
     res.status(500).json({ message: "Internal server error" });
