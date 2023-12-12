@@ -70,13 +70,23 @@ router.get("/latestPosts", async (req, res) => {
 
 router.get("/postsById/:id", async (req, res) => {
   try {
-    const post = await Post.findByPk(req.params.id);
+    const post = await Post.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          attributes: ["id", "fullname", "email", "no_hp", "photo_url"],
+        },
+      ],
+    });
+
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
+
     const unixPickupTime = moment(post.pickupTime).unix();
     const unixCreatedAt = moment(post.createdAt).unix();
     const unixUpdatedAt = moment(post.updatedAt).unix();
+
     const responsePost = {
       ...post.toJSON(),
       pickupTime: unixPickupTime,
@@ -84,25 +94,7 @@ router.get("/postsById/:id", async (req, res) => {
       updatedAt: unixUpdatedAt,
     };
 
-    const user = await User.findByPk(post.userId);
-    if (!user) {
-      return res.status(401).send("User not found");
-    }
-
-    const userInfo = {
-      id: user.id,
-      full_name: user.fullname,
-      email: user.email,
-      no_hp: user.no_hp,
-      photo_url: user.photo_url,
-    };
-
-    const combine = {
-      post: responsePost,
-      userInfo: userInfo,
-    };
-
-    res.status(200).json(combine);
+    res.status(200).json(responsePost);
   } catch (error) {
     console.error("Error fetching post", error);
     res.status(500).json({ message: "Internal server error" });
