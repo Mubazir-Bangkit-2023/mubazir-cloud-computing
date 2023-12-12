@@ -13,7 +13,7 @@ const geolib = require("geolib");
 const { invalidatedTokens } = require("./auth");
 
 //Get Routes posts
-router.get("/search", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { page = 1, limit = 10, lat, lon } = req.query;
     const offset = (page - 1) * limit;
@@ -46,15 +46,15 @@ router.get("/search", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
-  try {
-    const allPosts = await Post.findAll();
-    res.status(200).json({ posts: allPosts });
-  } catch (error) {
-    console.error("Error fetching all posts", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
+// router.get("/", async (req, res) => {
+//   try {
+//     const allPosts = await Post.findAll();
+//     res.status(200).json({ posts: allPosts });
+//   } catch (error) {
+//     console.error("Error fetching all posts", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
 router.get("/latestPosts", async (req, res) => {
   try {
