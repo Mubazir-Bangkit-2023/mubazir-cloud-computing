@@ -31,16 +31,6 @@ app.use("/auth", authRoutes);
 app.use("/posts", postsRoutes);
 app.use("/categories", CategoriesRoutes);
 
-app.get("/users", async (req, res) => {
-  try {
-    const users = await User.findAll();
-    res.json(users);
-  } catch (error) {
-    console.error("Error fetching users", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
