@@ -69,5 +69,5 @@ jobs:
             --image gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.IMAGE_NAME }}:latest \
             --region ${{ secrets.REGION }} \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated \
             --service-account=380213542706-compute@developer.gserviceaccount.com
