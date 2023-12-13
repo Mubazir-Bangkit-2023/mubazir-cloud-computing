@@ -3,9 +3,9 @@ const { v4: uuidv4 } = require("uuid");
 const path = require("path");
 const multer = require("multer");
 
-const pathKey = path.resolve("./config/credentials.json");
 
-const gcs = new Storage({});
+
+const gcs = new Storage();
 
 const bucketName = process.env.BUCKET_NAME;
 const bucket = gcs.bucket(bucketName);
