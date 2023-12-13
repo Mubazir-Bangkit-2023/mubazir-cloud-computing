@@ -70,4 +70,4 @@ jobs:
             --region ${{ secrets.REGION }} \
             --platform managed \
             --allow-unauthenticated
-            --service-account = 380213542706-compute@developer.gserviceaccount.com
+            --service-account=380213542706-compute@developer.gserviceaccount.com
