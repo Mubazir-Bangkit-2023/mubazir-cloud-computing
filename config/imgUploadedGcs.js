@@ -5,10 +5,7 @@ const multer = require("multer");
 
 const pathKey = path.resolve("./config/credentials.json");
 
-const gcs = new Storage({
-  projectId: process.env.PROJECT_ID,
-  keyFilename: pathKey,
-});
+const gcs = new Storage({});
 
 const bucketName = process.env.BUCKET_NAME;
 const bucket = gcs.bucket(bucketName);
