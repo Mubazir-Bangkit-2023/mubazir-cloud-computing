@@ -56,15 +56,90 @@ router.get("/posts", async (req, res) => {
   }
 });
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const allPosts = await Post.findAll();
-//     res.status(200).json({ posts: allPosts });
-//   } catch (error) {
-//     console.error("Error fetching all posts", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
+//Search
+router.get("/posts/search", async (req, res) => {
+  try {
+    let {
+      page = 1,
+      limit = 10,
+      lat,
+      lon,
+      title,
+      description,
+      category,
+      price,
+      radius,
+    } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const location_user = {
+      latitude: lat ? parseFloat(lat) : null,
+      longitude: lon ? parseFloat(lon) : null,
+    };
+
+    let whereCondition = {};
+
+    if (title || description || category || price) {
+      whereCondition[Op.and] = [];
+
+      if (title) {
+        whereCondition[Op.and].push({ title: { [Op.like]: `%${title}%` } });
+      }
+
+      if (description) {
+        whereCondition[Op.and].push({
+          description: { [Op.like]: `%${description}%` },
+        });
+      }
+
+      if (category) {
+        whereCondition[Op.and].push({ categoryId: category });
+      }
+
+      if (price) {
+        whereCondition[Op.and].push({ price: price });
+      }
+    }
+
+    const posts = await Post.findAll({ where: whereCondition });
+
+    const WithDistanceAndDistance = posts.map((post) => {
+      const locationPosts = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
+      const distance =
+        location_user.latitude && location_user.longitude
+          ? geolib.getDistance(location_user, locationPosts, 1)
+          : null;
+
+      return { ...post.dataValues, distance };
+    });
+
+    // Filter by radius
+    const filteredPosts = radius
+      ? WithDistanceAndDistance.filter((post) => post.distance <= radius)
+      : WithDistanceAndDistance;
+
+    // Sort by distance and then createdAtTimestamp
+    const sortPosts = filteredPosts.sort((a, b) => {
+      if (a.distance === b.distance) {
+        return b.createdAtTimestamp - a.createdAtTimestamp; // Sort by recency
+      }
+      return a.distance - b.distance; // Sort by proximity
+    });
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = startIndex + limit;
+    const paginatedPosts = sortPosts.slice(startIndex, endIndex);
+
+    res.status(200).json({ posts: paginatedPosts, page, limit });
+  } catch (error) {
+    console.error("Error searching and filtering posts", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
 router.get("/latest", async (req, res) => {
   try {
