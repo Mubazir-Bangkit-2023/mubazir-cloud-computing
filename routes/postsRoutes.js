@@ -13,9 +13,9 @@ const geolib = require("geolib");
 const { invalidatedTokens } = require("./auth");
 
 //Get Routes posts
-router.get("/", async (req, res) => {
+router.get("/posts", async (req, res) => {
   try {
-    const { page = 1, limit = 10, lat, lon, search } = req.query;
+    const { page = 1, limit = 10, lat, lon } = req.query;
     const offset = (page - 1) * limit;
 
     if (!lat || !lon) {
@@ -29,42 +29,29 @@ router.get("/", async (req, res) => {
       longitude: parseFloat(lon),
     };
 
-    let whereCondition = {};
+    const posts = await Post.findAll();
 
-    if (search) {
-      whereCondition = {
-        [Op.or]: [
-          { title: { [Op.like]: `%${search}%` } },
-          { description: { [Op.like]: `%${search}%` } },
-          { price: { [Op.like]: `%${search}%` } },
-          {},
-        ],
-      };
-    }
-
-    if (category) {
-      whereCondition.categoryId = category;
-    }
-
-    const WithDistance = await Post.findAll({ where: whereCondition });
-
-    const WithDistanceAndDistance = WithDistance.map((post) => {
+    const WithDistanceAndDistance = posts.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      return { ...post.dataValues, distance };
+      const createdAtTimestamp = new Date(post.createdAt).getTime();
+      return { ...post.dataValues, distance, createdAtTimestamp };
+    });
+    const sortPosts = WithDistanceAndDistance.sort((a, b) => {
+      if (a.distance === b.distance) {
+        return b.createdAtTimestamp - a.createdAtTimestamp;
+      }
+      return a.distance - b.distance;
     });
 
-    const sortPosts = WithDistanceAndDistance.sort(
-      (a, b) => a.distance - b.distance
-    );
-    const paginationPage = sortPosts.slice(offset, offset + parseInt(limit));
+    const paginatedPosts = sortPosts.slice(offset, offset + parseInt(limit));
 
-    res.status(200).json({ posts: paginationPage });
+    res.status(200).json({ posts: paginatedPosts, page, limit });
   } catch (error) {
-    console.error("Error fetching posts", error);
+    console.error("Error fetching all posts", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
