@@ -5,3 +5,8 @@
 
    ```bash
    https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing.git
+
+2. Install :
+
+   ```bash
+   npm install
