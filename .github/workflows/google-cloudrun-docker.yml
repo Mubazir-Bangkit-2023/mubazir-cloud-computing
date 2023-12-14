@@ -15,7 +15,7 @@ jobs:
       - name: Set Up Cloud SDK
         uses: google-github-actions/setup-gcloud@v0.2.0
         with: 
-            project_id: capstone-project-mubazirapp
+            project_id: ${{ secrets.PROJECT_ID }}
             service_account_key: ${{ secrets.SATRIO }}
 
 
@@ -33,9 +33,6 @@ jobs:
           echo REGION=${{ secrets.REGION }} >> .env
           echo SECRET_KEY=${{ secrets.SECRET_KEY }} >> .env
         
-      - name: create credentials.json
-        run: |
-          echo -e "${{ secrets.SATRIO }}" >> credentials.json
 
 
       - name: Set up Docker Buildx
@@ -60,7 +57,7 @@ jobs:
         with:
           context: .
           push: true
-          no-cache: true
+          no-cache: false
           tags: gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
