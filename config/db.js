@@ -11,7 +11,7 @@ const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
   timestamps: false,
   dialectoptions: {
-    socketpath: "/cloudsql/capstone-project-mubazirapp:asia-southeast2:mubazir",
+    socketpath: "mubazir-app-production:asia-southeast2:mubazir",
   },
 });
 
