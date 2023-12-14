@@ -70,4 +70,4 @@ jobs:
             --region ${{ secrets.REGION }} \
             --platform managed \
             --allow-unauthenticated \
-            --service-account=${{ secrets.SATRIO }}
+            --service-account=848793158287-compute@developer.gserviceaccount.com
