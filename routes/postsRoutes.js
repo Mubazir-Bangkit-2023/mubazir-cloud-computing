@@ -13,7 +13,7 @@ const geolib = require("geolib");
 const { invalidatedTokens } = require("./auth");
 
 //Get Routes posts
-router.get("posts/", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
     const { page = 1, limit = 10, lat, lon, search } = req.query;
     const offset = (page - 1) * limit;
@@ -69,17 +69,17 @@ router.get("posts/", async (req, res) => {
   }
 });
 
-router.get("/", async (req, res) => {
-  try {
-    const allPosts = await Post.findAll();
-    res.status(200).json({ posts: allPosts });
-  } catch (error) {
-    console.error("Error fetching all posts", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
+// router.get("/", async (req, res) => {
+//   try {
+//     const allPosts = await Post.findAll();
+//     res.status(200).json({ posts: allPosts });
+//   } catch (error) {
+//     console.error("Error fetching all posts", error);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
 
-router.get("latest/", async (req, res) => {
+router.get("/latest", async (req, res) => {
   try {
     const latestPosts = await Post.findAll({
       order: [["createdAt", "DESC"]],
@@ -91,7 +91,7 @@ router.get("latest/", async (req, res) => {
   }
 });
 
-router.get("posts/:id", async (req, res) => {
+router.get("/posts/:id", async (req, res) => {
   try {
     const post = await Post.findByPk(req.params.id, {
       include: [
@@ -124,7 +124,7 @@ router.get("posts/:id", async (req, res) => {
   }
 });
 
-router.get("Category/:categoryId", async (req, res) => {
+router.get("/Category/:categoryId", async (req, res) => {
   try {
     const id_cat = req.params.categoryId;
     const postsByCategory = await Post.findAll({
@@ -139,7 +139,34 @@ router.get("Category/:categoryId", async (req, res) => {
   }
 });
 
-router.get("posts/recommendation/nearby", async (req, res) => {
+router.get("/filterByTitle", async (req, res) => {
+  try {
+    const titleFilter = req.query.title;
+    if (!titleFilter) {
+      return res.status(400).json({ message: "Missing title parameter" });
+    }
+    const filteredPosts = await Post.findAll({
+      where: {
+        title: {
+          [Op.iLike]: `%${titleFilter}%`,
+        },
+      },
+    });
+
+    if (filteredPosts.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No posts found with the specified title" });
+    }
+
+    res.status(200).json({ posts: filteredPosts });
+  } catch (error) {
+    console.error("Error fetching posts by title", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+router.get("/recommendation/nearby", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -169,7 +196,7 @@ router.get("posts/recommendation/nearby", async (req, res) => {
   }
 });
 
-router.get("posts/recommendation/restaurant", async (req, res) => {
+router.get("/recommendation/restaurant", async (req, res) => {
   try {
     const { lat, lon } = req.query;
 
@@ -225,7 +252,7 @@ router.get("posts/recommendation/restaurant", async (req, res) => {
   }
 });
 
-router.get("posts/recommendation/homefood", async (req, res) => {
+router.get("/recommendation/homefood", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -276,7 +303,7 @@ router.get("posts/recommendation/homefood", async (req, res) => {
   }
 });
 
-router.get("posts/recommendation/rawIngredients", async (req, res) => {
+router.get("/recommendation/rawIngredients", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -329,7 +356,7 @@ router.get("posts/recommendation/rawIngredients", async (req, res) => {
 
 //Post Routes
 router.post(
-  "posts/food",
+  "/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
@@ -417,7 +444,7 @@ router.post(
 
 //Put Routes
 router.put(
-  "posts/Update/:id",
+  "/postsUpdate/:id",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
@@ -498,7 +525,7 @@ router.put(
 );
 
 //Delete Routes
-router.delete("posts/delete/:id", async (req, res) => {
+router.delete("/deletePost/:id", async (req, res) => {
   try {
     const headerAuth = req.headers["authorization"];
     const token = headerAuth && headerAuth.split(" ")[1];

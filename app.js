@@ -28,7 +28,7 @@ app.use(
 app.use(cors());
 
 app.use("/auth", authRoutes);
-app.use("/", postsRoutes);
+app.use(postsRoutes);
 app.use("/categories", CategoriesRoutes);
 
 app.listen(port, () => {
