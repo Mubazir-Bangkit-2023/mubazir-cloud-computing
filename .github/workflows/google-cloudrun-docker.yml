@@ -16,7 +16,7 @@ jobs:
         uses: google-github-actions/setup-gcloud@v0.2.0
         with: 
             project_id: ${{ secrets.PROJECT_ID }}
-            service_account_key: ${{ secrets.SATRIO }}
+            service_account_key: ${{ secrets.MUBAZIR }}
 
 
       - name: Create .env file
@@ -43,13 +43,13 @@ jobs:
         with:
           registry: gcr.io
           username: _json_key
-          password: ${{ secrets.SATRIO }}
+          password: ${{ secrets.MUBAZIR }}
 
       - name: Setup gcloud CLI
         uses: google-github-actions/setup-gcloud@v0.2.1
         with:
           project_id: ${{ secrets.PROJECT_ID }}
-          service_account_key: ${{ secrets.SATRIO }}
+          service_account_key: ${{ secrets.MUBAZIR }}
           export_default_credentials: true
 
       - name: Build and push Docker image
@@ -57,7 +57,7 @@ jobs:
         with:
           context: .
           push: true
-          no-cache: false
+          no-cache: true
           tags: gcr.io/${{ secrets.PROJECT_ID }}/${{ secrets.IMAGE_NAME }}:latest
 
       - name: Deploy to Cloud Run
