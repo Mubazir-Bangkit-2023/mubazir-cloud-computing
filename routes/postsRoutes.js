@@ -356,7 +356,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
 
 //Post Routes
 router.post(
-  "/food",
+  "/posts/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
