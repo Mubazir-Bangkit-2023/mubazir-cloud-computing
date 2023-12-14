@@ -6,27 +6,48 @@ const Post = require("../models/posts");
 const Category = require("../models/category");
 const User = require("../models/user");
 const ImgUpload = require("../config/imgUploadedGcs");
-const bcrypt = require("bcryptjs");
+const { Op } = require("sequelize");
 const moment = require("moment");
 const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");
 
 //Get Routes posts
-router.get("/", async (req, res) => {
+router.get("posts/", async (req, res) => {
   try {
-    const { page = 1, limit = 10, lat, lon } = req.query;
+    const { page = 1, limit = 10, lat, lon, search } = req.query;
     const offset = (page - 1) * limit;
+
     if (!lat || !lon) {
       return res
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
+
     const location_user = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
-    const WithDistance = await Post.findAll();
+
+    let whereCondition = {};
+
+    if (search) {
+      whereCondition = {
+        [Op.or]: [
+          { title: { [Op.like]: `%${search}%` } },
+          { description: { [Op.like]: `%${search}%` } },
+          { price: { [Op.like]: `%${search}%` } },
+          {},
+        ],
+      };
+    }
+
+    if (category) {
+      whereCondition.categoryId = category;
+    }
+
+    const WithDistance = await Post.findAll({ where: whereCondition });
+
     const WithDistanceAndDistance = WithDistance.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
@@ -35,10 +56,12 @@ router.get("/", async (req, res) => {
       const distance = geolib.getDistance(location_user, locationPosts, 1);
       return { ...post.dataValues, distance };
     });
+
     const sortPosts = WithDistanceAndDistance.sort(
       (a, b) => a.distance - b.distance
     );
     const paginationPage = sortPosts.slice(offset, offset + parseInt(limit));
+
     res.status(200).json({ posts: paginationPage });
   } catch (error) {
     console.error("Error fetching posts", error);
@@ -46,17 +69,17 @@ router.get("/", async (req, res) => {
   }
 });
 
-// router.get("/", async (req, res) => {
-//   try {
-//     const allPosts = await Post.findAll();
-//     res.status(200).json({ posts: allPosts });
-//   } catch (error) {
-//     console.error("Error fetching all posts", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
+router.get("/", async (req, res) => {
+  try {
+    const allPosts = await Post.findAll();
+    res.status(200).json({ posts: allPosts });
+  } catch (error) {
+    console.error("Error fetching all posts", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
 
-router.get("/latest", async (req, res) => {
+router.get("latest/", async (req, res) => {
   try {
     const latestPosts = await Post.findAll({
       order: [["createdAt", "DESC"]],
@@ -68,7 +91,7 @@ router.get("/latest", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("posts/:id", async (req, res) => {
   try {
     const post = await Post.findByPk(req.params.id, {
       include: [
@@ -101,7 +124,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.get("/Category/:categoryId", async (req, res) => {
+router.get("Category/:categoryId", async (req, res) => {
   try {
     const id_cat = req.params.categoryId;
     const postsByCategory = await Post.findAll({
@@ -116,34 +139,7 @@ router.get("/Category/:categoryId", async (req, res) => {
   }
 });
 
-router.get("/filterByTitle", async (req, res) => {
-  try {
-    const titleFilter = req.query.title;
-    if (!titleFilter) {
-      return res.status(400).json({ message: "Missing title parameter" });
-    }
-    const filteredPosts = await Post.findAll({
-      where: {
-        title: {
-          [Op.iLike]: `%${titleFilter}%`,
-        },
-      },
-    });
-
-    if (filteredPosts.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No posts found with the specified title" });
-    }
-
-    res.status(200).json({ posts: filteredPosts });
-  } catch (error) {
-    console.error("Error fetching posts by title", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
-router.get("/recommendation/nearby", async (req, res) => {
+router.get("posts/recommendation/nearby", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -173,7 +169,7 @@ router.get("/recommendation/nearby", async (req, res) => {
   }
 });
 
-router.get("/recommendation/restaurant", async (req, res) => {
+router.get("posts/recommendation/restaurant", async (req, res) => {
   try {
     const { lat, lon } = req.query;
 
@@ -229,7 +225,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
   }
 });
 
-router.get("/recommendation/homefood", async (req, res) => {
+router.get("posts/recommendation/homefood", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -280,7 +276,7 @@ router.get("/recommendation/homefood", async (req, res) => {
   }
 });
 
-router.get("/recommendation/rawIngredients", async (req, res) => {
+router.get("posts/recommendation/rawIngredients", async (req, res) => {
   try {
     const { lat, lon } = req.query;
     if (!lat || !lon) {
@@ -333,7 +329,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
 
 //Post Routes
 router.post(
-  "/food",
+  "posts/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
@@ -349,15 +345,15 @@ router.post(
       isAvailable,
     } = req.body;
     try {
-      const authHeader = req.headers["authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
+      const headerAuth = req.headers["authorization"];
+      const token = headerAuth && headerAuth.split(" ")[1];
       if (!token) {
         return res.status(401).json({ message: "Unauthorized: Missing token" });
       }
       try {
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("Decoded Token:", decodedToken);
-        if (!decodedToken.id) {
+        const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("Decoded Token:", tokenDecode);
+        if (!tokenDecode.id) {
           return res
             .status(401)
             .json({ message: "Unauthorized: User not logged in" });
@@ -397,7 +393,7 @@ router.post(
           lat,
           lon,
           categoryId,
-          userId: decodedToken.id,
+          userId: tokenDecode.id,
           isAvailable: isAvailable || true,
         });
         res
@@ -421,7 +417,7 @@ router.post(
 
 //Put Routes
 router.put(
-  "/postsUpdate/:id",
+  "posts/Update/:id",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
@@ -442,23 +438,23 @@ router.put(
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
-      const authHeader = req.headers["authorization"];
-      const token = authHeader && authHeader.split(" ")[1];
+      const headerAuth = req.headers["authorization"];
+      const token = headerAuth && headerAuth.split(" ")[1];
 
       if (!token) {
         return res.status(401).json({ message: "Unauthorized: Missing token" });
       }
 
       try {
-        const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("Decoded Token:", decodedToken);
+        const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
+        console.log("Decoded Token:", tokenDecode);
 
-        if (!decodedToken.id) {
+        if (!tokenDecode.id) {
           return res
             .status(401)
             .json({ message: "Unauthorized: User not logged in" });
         }
-        if (decodedToken.id !== post.userId) {
+        if (tokenDecode.id !== post.userId) {
           return res.status(403).json({
             message:
               "Forbidden: User does not have permission to update this post",
@@ -502,16 +498,16 @@ router.put(
 );
 
 //Delete Routes
-router.delete("/deletePost/:id", async (req, res) => {
+router.delete("posts/delete/:id", async (req, res) => {
   try {
-    const authHeader = req.headers["authorization"];
-    const token = authHeader && authHeader.split(" ")[1];
-    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("Decoded Token:", decodedToken);
+    const headerAuth = req.headers["authorization"];
+    const token = headerAuth && headerAuth.split(" ")[1];
+    const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
+    console.log("Decoded Token:", tokenDecode);
     const deletedPost = await Post.destroy({
       where: {
         id: req.params.id,
-        userId: decodedToken.id,
+        userId: tokenDecode.id,
       },
     });
     if (!deletedPost) {
