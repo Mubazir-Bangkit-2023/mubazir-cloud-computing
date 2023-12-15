@@ -501,61 +501,70 @@ router.put(
       if (!post) {
         return res.status(404).json({ message: "Post not found" });
       }
-      const headerAuth = req.headers["authorization"];
-      const token = headerAuth && headerAuth.split(" ")[1];
+      const tokenDecode = req.authData;
 
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized: Missing token" });
+      if (!tokenDecode.id) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized: User not logged in" });
+      }
+      if (tokenDecode.id !== post.userId) {
+        return res.status(403).json({
+          message:
+            "Forbidden: User does not have permission to update this post",
+        });
       }
 
+      // Ensure that pickupTime is defined in the request body
+      const {
+        title,
+        description,
+        price,
+        lat,
+        lon,
+        freshness,
+        categoryId,
+        isAvailable,
+        pickupTime,
+      } = req.body;
+
+      if (!pickupTime) {
+        return res.status(400).json({ message: "pickupTime is required" });
+      }
+
+      let formatDateTime = "";
       try {
-        const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("Decoded Token:", tokenDecode);
-
-        if (!tokenDecode.id) {
-          return res
-            .status(401)
-            .json({ message: "Unauthorized: User not logged in" });
-        }
-        if (tokenDecode.id !== post.userId) {
-          return res.status(403).json({
-            message:
-              "Forbidden: User does not have permission to update this post",
-          });
-        }
-        let formatDateTime = "";
-        try {
-          const datetime = moment.unix(pickupTime);
-          formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-        } catch (error) {
-          console.error("Error converting pickupTime:", error);
-        }
-        post.title = title;
-        post.description = description;
-        post.price = price;
-        post.pickupTime = formatDateTime;
-        post.lat = lat;
-        post.lon = lon;
-        post.freshness = freshness;
-        post.categoryId = categoryId;
-        post.isAvailable = isAvailable;
-        if (req.file && req.file.cloudStoragePublicUrl) {
-          post.imgUrl = req.file.cloudStoragePublicUrl;
-        }
-        await post.save();
-        res.status(200).json({ message: "Post updated successfully", post });
+        const datetime = moment.unix(pickupTime);
+        formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
       } catch (error) {
-        console.error("Error updating post", error);
-        if (invalidatedTokens && invalidatedTokens.has(token)) {
-          return res
-            .status(401)
-            .json({ message: "Unauthorized: Token invalidated" });
-        }
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        console.error("Error converting pickupTime:", error);
+        return res.status(400).json({ message: "Invalid pickupTime format" });
       }
+
+      post.title = title;
+      post.description = description;
+      post.price = price;
+      post.pickupTime = formatDateTime;
+      post.lat = lat;
+      post.lon = lon;
+      post.freshness = freshness;
+      post.categoryId = categoryId;
+      post.isAvailable = isAvailable;
+
+      if (req.file && req.file.cloudStoragePublicUrl) {
+        post.imgUrl = req.file.cloudStoragePublicUrl;
+      }
+
+      await post.save();
+      res.status(200).json({ message: "Post updated successfully", post });
     } catch (error) {
       console.error("Error updating post", error);
-      res.status(500).json({ message: "Internal server error" });
+      if (invalidatedTokens && invalidatedTokens.has(token)) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized: Token invalidated" });
+      }
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
   }
 );
@@ -563,10 +572,7 @@ router.put(
 //Delete Routes
 router.delete("/deletePost/:id", async (req, res) => {
   try {
-    const headerAuth = req.headers["authorization"];
-    const token = headerAuth && headerAuth.split(" ")[1];
-    const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
-    console.log("Decoded Token:", tokenDecode);
+    const tokenDecode = req.authData;
     const deletedPost = await Post.destroy({
       where: {
         id: req.params.id,
