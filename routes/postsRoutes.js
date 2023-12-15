@@ -600,7 +600,6 @@ router.put(
       if (fullname) {
         user.fullname = fullname;
       }
-
       if (no_hp) {
         user.no_hp = no_hp;
       }
