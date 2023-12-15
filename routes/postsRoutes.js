@@ -583,4 +583,55 @@ router.delete("/deletePost/:id", async (req, res) => {
   }
 });
 
+//update user
+router.put(
+  "/updateUser",
+  authMiddleware.authenticateToken,
+  async (req, res) => {
+    try {
+      const userId = req.authData.id;
+      const user = await User.findByPk(userId);
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      const { fullname, no_hp, email, newPassword, photo_url } = req.body;
+      if (fullname) {
+        user.fullname = fullname;
+      }
+
+      if (no_hp) {
+        user.no_hp = no_hp;
+      }
+
+      if (email) {
+        const emailTaken = await User.findOne({
+          where: { email, id: { [Op.not]: userId } },
+        });
+
+        if (emailTaken) {
+          return res.status(400).json({ message: "Email is already taken" });
+        }
+
+        user.email = email;
+      }
+
+      if (newPassword) {
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        user.password = hashedPassword;
+      }
+      if (photo_url) {
+        user.photo_url = photo_url;
+      }
+      await user.save();
+
+      res.status(200).json({ message: "User updated successfully", user });
+    } catch (error) {
+      console.error("Error updating user", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
 module.exports = router;
