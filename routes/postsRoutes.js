@@ -11,46 +11,8 @@ const moment = require("moment");
 const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");
+const authMiddleware = require("./authMiddleware");
 
-//Get Routes posts
-// router.get("/posts", async (req, res) => {
-//   try {
-//     const { page = 1, limit = 10, lat, lon } = req.query;
-//     const offset = (page - 1) * limit;
-//     if (!lat || !lon) {
-//       return res
-//         .status(400)
-//         .json({ message: "Missing latitude or longitude parameters" });
-//     }
-//     const location_user = {
-//       latitude: parseFloat(lat),
-//       longitude: parseFloat(lon),
-//     };
-//     const posts = await Post.findAll();
-//     const WithDistanceAndDistance = posts.map((post) => {
-//       const locationPosts = {
-//         latitude: parseFloat(post.lat),
-//         longitude: parseFloat(post.lon),
-//       };
-//       const distance = geolib.getDistance(location_user, locationPosts, 1);
-//       const createdAtTimestamp = new Date(post.createdAt).getTime();
-//       return { ...post.dataValues, distance, createdAtTimestamp };
-//     });
-//     const sortPosts = WithDistanceAndDistance.sort((a, b) => {
-//       if (a.distance === b.distance) {
-//         return b.createdAtTimestamp - a.createdAtTimestamp;
-//       }
-//       return a.distance - b.distance;
-//     });
-//     const paginatedPosts = sortPosts.slice(offset, offset + parseInt(limit));
-//     res.status(200).json({ posts: paginatedPosts, page, limit });
-//   } catch (error) {
-//     console.error("Error fetching all posts", error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
-
-//Search
 router.get("/posts", async (req, res) => {
   try {
     const {
@@ -86,38 +48,46 @@ router.get("/posts", async (req, res) => {
         ],
       };
     }
-
     if (category) {
       whereCondition.categoryId = category;
     }
-
-    // Add additional filtering conditions based on radius and price if needed
-
+    if (price) {
+      whereCondition.price = { [Op.lte]: parseFloat(price) };
+    }
     const posts = await Post.findAll({ where: whereCondition });
-
     const WithDistanceAndDistance = posts.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      const createdAtTimestamp = new Date(post.createdAt).getTime();
-      return { ...post.dataValues, distance, createdAtTimestamp };
+
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      const responsePost = {
+        ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
+        distance,
+      };
+
+      return responsePost;
     });
 
     let sortedPosts;
-
-    // Conditionally sort based on search/filter parameters
     if (search || category || radius || price) {
       sortedPosts = WithDistanceAndDistance;
     } else {
+      // If certain conditions are met, sort by createdAt in descending order
       sortedPosts = WithDistanceAndDistance.sort(
-        (a, b) => b.createdAtTimestamp - a.createdAtTimestamp
+        (a, b) => b.createdAt - a.createdAt
       );
     }
 
     const paginatedPosts = sortedPosts.slice(offset, offset + parseInt(limit));
-
     res.status(200).json({ posts: paginatedPosts, page, limit });
   } catch (error) {
     console.error("Error fetching posts", error);
@@ -130,7 +100,21 @@ router.get("/latest", async (req, res) => {
     const latestPosts = await Post.findAll({
       order: [["createdAt", "DESC"]],
     });
-    res.status(200).json({ posts: latestPosts });
+
+    const postsWithUnixTimestamps = latestPosts.map((post) => {
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      return {
+        ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
+      };
+    });
+
+    res.status(200).json({ posts: postsWithUnixTimestamps });
   } catch (error) {
     console.error("Error fetching latest posts", error);
     res.status(500).json({ message: "Internal server error" });
@@ -185,33 +169,6 @@ router.get("/Category/:categoryId", async (req, res) => {
   }
 });
 
-router.get("/filterByTitle", async (req, res) => {
-  try {
-    const titleFilter = req.query.title;
-    if (!titleFilter) {
-      return res.status(400).json({ message: "Missing title parameter" });
-    }
-    const filteredPosts = await Post.findAll({
-      where: {
-        title: {
-          [Op.iLike]: `%${titleFilter}%`,
-        },
-      },
-    });
-
-    if (filteredPosts.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "No posts found with the specified title" });
-    }
-
-    res.status(200).json({ posts: filteredPosts });
-  } catch (error) {
-    console.error("Error fetching posts by title", error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
-
 router.get("/recommendation/nearby", async (req, res) => {
   try {
     const { lat, lon } = req.query;
@@ -231,7 +188,20 @@ router.get("/recommendation/nearby", async (req, res) => {
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      return { ...post.dataValues, distance };
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      // Create the response object with Unix timestamps
+      const responsePost = {
+        ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
+        distance,
+      };
+
+      return responsePost;
     });
     const sortPosts = WithDistance.sort((a, b) => a.distance - b.distance);
     const nearbyPosts = sortPosts.slice(0, 5);
@@ -268,24 +238,22 @@ router.get("/recommendation/restaurant", async (req, res) => {
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      const differenceLat = Math.abs(
-        location_user.latitude - locationPosts.latitude
-      );
-      const differenceLon = Math.abs(
-        location_user.longitude - locationPosts.longitude
-      );
 
-      return {
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      const responseRestaurantPost = {
         ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
         distance,
-        latUser: location_user.latitude,
-        userLon: location_user.longitude,
-        latPost: locationPosts.latitude,
-        lonPost: locationPosts.longitude,
-        differenceLat,
-        differenceLon,
       };
+
+      return responseRestaurantPost;
     });
+
     const sortedRestaurants = restaurantWithDistance.sort(
       (a, b) => a.distance - b.distance
     );
@@ -310,37 +278,38 @@ router.get("/recommendation/homefood", async (req, res) => {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
-    const homefoodPosts = await Post.findAll({
+    const rawIngredientsPosts = await Post.findAll({
       where: {
         categoryId: 2,
       },
     });
-    const homefoodWithDistance = homefoodPosts.map((post) => {
+    const withDistance = rawIngredientsPosts.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      const differenceLat = Math.abs(
-        location_user.latitude - locationPosts.latitude
-      );
-      const differenceLon = Math.abs(
-        location_user.longitude - locationPosts.longitude
-      );
-      return {
+
+      // Convert timestamps to Unix format
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      // Create the response object with Unix timestamps and distance
+      const responseHomefoodPost = {
         ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
         distance,
-        latUser: location_user.latitude,
-        lonUser: location_user.longitude,
-        latPost: locationPosts.latitude,
-        lonPost: locationPosts.longitude,
-        differenceLat,
-        differenceLon,
       };
+
+      return responseHomefoodPost;
     });
-    const sortHomefood = homefoodWithDistance.sort(
-      (a, b) => a.distance - b.distance
-    );
+
+    // Sort by distance after timestamp conversion
+    const sortHomefood = withDistance.sort((a, b) => a.distance - b.distance);
+
     const homefoodPost = sortHomefood.slice(0, 5);
     res.status(200).json({ homefood: homefoodPost });
   } catch (error) {
@@ -361,41 +330,45 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
-    const ingredientsPosts = await Post.findAll({
+    const rawIngredientsPosts = await Post.findAll({
       where: {
-        categoryId: 3,
+        categoryId: 3, // Category ID for "raw ingredients"
       },
     });
-    const ingredientsWithDistance = ingredientsPosts.map((post) => {
+    const withDistance = rawIngredientsPosts.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
       const distance = geolib.getDistance(location_user, locationPosts, 1);
-      const differenceLat = Math.abs(
-        location_user.latitude - locationPosts.latitude
-      );
-      const differenceLon = Math.abs(
-        location_user.longitude - locationPosts.longitude
-      );
-      return {
+
+      // Convert timestamps to Unix format
+      const unixPickupTime = moment(post.pickupTime).unix();
+      const unixCreatedAt = moment(post.createdAt).unix();
+      const unixUpdatedAt = moment(post.updatedAt).unix();
+
+      // Create the response object with Unix timestamps and distance
+      const responseRawIngredientsPost = {
         ...post.dataValues,
+        pickupTime: unixPickupTime,
+        createdAt: unixCreatedAt,
+        updatedAt: unixUpdatedAt,
         distance,
-        latUser: location_user.latitude,
-        lonUser: location_user.longitude,
-        latPost: locationPosts.latitude,
-        lonPost: locationPosts.longitude,
-        differenceLat,
-        differenceLon,
       };
+
+      return responseRawIngredientsPost;
     });
-    const sortedIngredients = ingredientsWithDistance.sort(
-      (a, b) => a.distance - b.distance
-    );
-    const ingredientsPost = sortedIngredients.slice(0, 5);
-    res.status(200).json({ rawIngredients: ingredientsPost });
+
+    // Sort by distance after timestamp conversion
+    const sort = withDistance.sort((a, b) => a.distance - b.distance);
+
+    const rawIngredientsPost = sort.slice(0, 5);
+    res.status(200).json({ raw_ingredients: rawIngredientsPost });
   } catch (error) {
-    console.error("Error fetching nearby homefood recommendations", error);
+    console.error(
+      "Error fetching nearby raw ingredients recommendations",
+      error
+    );
     res.status(500).json({ message: "Internal server error" });
   }
 });
@@ -405,6 +378,7 @@ router.post(
   "/posts/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
+  authMiddleware.authenticateToken,
   async (req, res) => {
     const {
       title,
@@ -418,72 +392,51 @@ router.post(
       isAvailable,
     } = req.body;
     try {
-      const headerAuth = req.headers["authorization"];
-      const token = headerAuth && headerAuth.split(" ")[1];
-      if (!token) {
-        return res.status(401).json({ message: "Unauthorized: Missing token" });
+      const tokenDecode = req.authData; // Use the decoded token from middleware
+      const categoryExists = await Category.findByPk(categoryId);
+      if (!categoryExists) {
+        return res.status(404).json({ message: "Category not found" });
       }
+      let imageUrl = "";
+      if (req.file && req.file.cloudStoragePublicUrl) {
+        imageUrl = req.file.cloudStoragePublicUrl;
+      }
+
+      let formatDateTime = "";
+      let numericDateTime = 0;
       try {
-        const tokenDecode = jwt.verify(token, process.env.SECRET_KEY);
-        console.log("Decoded Token:", tokenDecode);
-        if (!tokenDecode.id) {
-          return res
-            .status(401)
-            .json({ message: "Unauthorized: User not logged in" });
-        }
-        if (invalidatedTokens && invalidatedTokens.has(token)) {
-          return res
-            .status(401)
-            .json({ message: "Unauthorized: Token invalidated" });
-        }
-        const categoryExists = await Category.findByPk(categoryId);
-        if (!categoryExists) {
-          return res.status(404).json({ message: "Category not found" });
-        }
-        let imageUrl = "";
-        if (req.file && req.file.cloudStoragePublicUrl) {
-          imageUrl = req.file.cloudStoragePublicUrl;
-        }
-
-        let formatDateTime = "";
-        let numericDateTime = 0;
-        try {
-          const datetime = moment.unix(pickupTime);
-          formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-          numericDateTime = datetime.unix();
-        } catch (error) {
-          console.error("Error converting pickupTime:", error);
-        }
-
-        const newPost = await Post.create({
-          id: uuidv4(),
-          title,
-          description,
-          price,
-          pickupTime: formatDateTime,
-          imgUrl: imageUrl,
-          freshness,
-          lat,
-          lon,
-          categoryId,
-          userId: tokenDecode.id,
-          isAvailable: isAvailable || true,
-        });
-        res
-          .status(201)
-          .json({ message: "Post created successfully", post: newPost });
+        const datetime = moment.unix(pickupTime);
+        formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+        numericDateTime = datetime.unix();
       } catch (error) {
-        if (invalidatedTokens && invalidatedTokens.has(token)) {
-          return res
-            .status(401)
-            .json({ message: "Unauthorized: Token invalidated" });
-        }
-        console.error("Error creating post", error);
-        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+        console.error("Error converting pickupTime:", error);
       }
+
+      const newPost = await Post.create({
+        id: uuidv4(),
+        title,
+        description,
+        price,
+        pickupTime: formatDateTime,
+        imgUrl: imageUrl,
+        freshness,
+        lat,
+        lon,
+        categoryId,
+        userId: tokenDecode.id,
+        isAvailable: isAvailable || true,
+      });
+      res
+        .status(201)
+        .json({ message: "Post created successfully", post: newPost });
     } catch (error) {
+      if (invalidatedTokens && invalidatedTokens.has(req.token)) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized: Token invalidated" });
+      }
       console.error("Error creating post", error);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(401).json({ message: "Unauthorized: Invalid token" });
     }
   }
 );
