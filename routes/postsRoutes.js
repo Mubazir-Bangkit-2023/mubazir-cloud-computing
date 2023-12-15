@@ -484,17 +484,6 @@ router.put(
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
   async (req, res) => {
-    const {
-      title,
-      description,
-      price,
-      pickupTime,
-      lat,
-      lon,
-      freshness,
-      categoryId,
-      isAvailable,
-    } = req.body;
     const postId = req.params.id;
     try {
       const post = await Post.findByPk(postId);
@@ -515,7 +504,6 @@ router.put(
         });
       }
 
-      // Ensure that pickupTime is defined in the request body
       const {
         title,
         description,
@@ -559,6 +547,10 @@ router.put(
       res.status(200).json({ message: "Post updated successfully", post });
     } catch (error) {
       console.error("Error updating post", error);
+      const token =
+        req.headers["authorization"] &&
+        req.headers["authorization"].split(" ")[1];
+
       if (invalidatedTokens && invalidatedTokens.has(token)) {
         return res
           .status(401)
