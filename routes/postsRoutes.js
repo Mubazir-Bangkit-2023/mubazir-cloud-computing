@@ -373,6 +373,44 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
   }
 });
 
+router.get(
+  "/user/posts",
+  authMiddleware.authenticateToken,
+  async (req, res) => {
+    try {
+      const userId = req.authData.id;
+
+      const posts = await Post.findAll({
+        where: { userId },
+        include: [
+          {
+            model: User,
+            attributes: ["id", "fullname", "email", "no_hp", "photo_url"],
+          },
+        ],
+      });
+
+      const postsWithUnixTimestamps = posts.map((post) => {
+        const unixPickupTime = moment(post.pickupTime).unix();
+        const unixCreatedAt = moment(post.createdAt).unix();
+        const unixUpdatedAt = moment(post.updatedAt).unix();
+
+        return {
+          ...post.dataValues,
+          pickupTime: unixPickupTime,
+          createdAt: unixCreatedAt,
+          updatedAt: unixUpdatedAt,
+        };
+      });
+
+      res.status(200).json({ posts: postsWithUnixTimestamps });
+    } catch (error) {
+      console.error("Error fetching user posts", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
 //Post Routes
 router.post(
   "/posts/food",
