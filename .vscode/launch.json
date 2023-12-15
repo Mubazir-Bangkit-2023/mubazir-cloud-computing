@@ -1,0 +1,10 @@
+{
+  "configurations": [
+    {
+      "type": "chrome",
+      "name": "http://vscode-pets.start",
+      "request": "launch",
+      "url": "http://vscode-pets.start"
+    }
+  ]
+}

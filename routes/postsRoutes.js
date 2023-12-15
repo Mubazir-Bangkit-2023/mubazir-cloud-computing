@@ -81,7 +81,6 @@ router.get("/posts", async (req, res) => {
     if (search || category || radius || price) {
       sortedPosts = WithDistanceAndDistance;
     } else {
-      // If certain conditions are met, sort by createdAt in descending order
       sortedPosts = WithDistanceAndDistance.sort(
         (a, b) => b.createdAt - a.createdAt
       );
@@ -192,7 +191,6 @@ router.get("/recommendation/nearby", async (req, res) => {
       const unixCreatedAt = moment(post.createdAt).unix();
       const unixUpdatedAt = moment(post.updatedAt).unix();
 
-      // Create the response object with Unix timestamps
       const responsePost = {
         ...post.dataValues,
         pickupTime: unixPickupTime,
