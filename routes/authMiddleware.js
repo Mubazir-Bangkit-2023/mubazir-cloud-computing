@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { invalidatedTokens } = require("./auth");
 
 const authenticateToken = (req, res, next) => {
   const headerAuth = req.headers["authorization"];
@@ -8,16 +9,26 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized: Missing token" });
   }
 
-  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: "Forbidden: Invalid token" });
+  try {
+    const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
+    if (!decodedToken.id) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: User not logged in" });
     }
 
-    req.user = user;
+    if (invalidatedTokens && invalidatedTokens.has(token)) {
+      return res
+        .status(401)
+        .json({ message: "Unauthorized: Token invalidated" });
+    }
+
+    req.authData = decodedToken;
     next();
-  });
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return res.status(401).json({ message: "Unauthorized: Invalid token" });
+  }
 };
 
-module.exports = {
-  authenticateToken,
-};
+module.exports = { authenticateToken };

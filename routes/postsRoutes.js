@@ -391,12 +391,15 @@ router.post(
       categoryId,
       isAvailable,
     } = req.body;
+
     try {
       const tokenDecode = req.authData; // Use the decoded token from middleware
       const categoryExists = await Category.findByPk(categoryId);
+
       if (!categoryExists) {
         return res.status(404).json({ message: "Category not found" });
       }
+
       let imageUrl = "";
       if (req.file && req.file.cloudStoragePublicUrl) {
         imageUrl = req.file.cloudStoragePublicUrl;
@@ -426,17 +429,13 @@ router.post(
         userId: tokenDecode.id,
         isAvailable: isAvailable || true,
       });
+
       res
         .status(201)
         .json({ message: "Post created successfully", post: newPost });
     } catch (error) {
-      if (invalidatedTokens && invalidatedTokens.has(req.token)) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: Token invalidated" });
-      }
       console.error("Error creating post", error);
-      res.status(401).json({ message: "Unauthorized: Invalid token" });
+      res.status(500).json({ message: "Internal server error" });
     }
   }
 );
