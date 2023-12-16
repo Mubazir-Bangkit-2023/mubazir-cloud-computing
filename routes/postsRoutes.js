@@ -84,12 +84,18 @@ router.get("/posts", async (req, res) => {
     });
 
     let sortPost;
-    if (search || category || radius || price || (lat && lon)) {
+
+    if (search || category || price || (lat && lon)) {
       sortPost = WithDistanceAndDistance;
     } else {
       sortPost = WithDistanceAndDistance.sort(
         (a, b) => b.createdAt - a.createdAt
       );
+    }
+
+    if (radius && userLocation.latitude && userLocation.longitude) {
+      // Sort based on distance if radius filter is applied
+      sortPost.sort((a, b) => a.distance - b.distance);
     }
 
     const pagePost = sortPost.slice(offset, offset + parseInt(limit));
