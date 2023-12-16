@@ -27,15 +27,15 @@ router.get("/posts", async (req, res) => {
     } = req.query;
     const offset = (page - 1) * limit;
 
-    if (!lat || !lon) {
-      return res
-        .status(400)
-        .json({ message: "Missing latitude or longitude parameters" });
+    const userLocation = {};
+
+    if (lat) {
+      userLocation.latitude = parseFloat(lat);
     }
-    const userLocation = {
-      latitude: parseFloat(lat),
-      longitude: parseFloat(lon),
-    };
+
+    if (lon) {
+      userLocation.longitude = parseFloat(lon);
+    }
 
     let whereCondition = {};
 
@@ -54,13 +54,19 @@ router.get("/posts", async (req, res) => {
     if (price) {
       whereCondition.price = { [Op.lte]: parseFloat(price) };
     }
+
     const posts = await Post.findAll({ where: whereCondition });
+
     const WithDistanceAndDistance = posts.map((post) => {
       const locationPosts = {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+
+      const distance =
+        userLocation.latitude && userLocation.longitude
+          ? geolib.getDistance(userLocation, locationPosts)
+          : null;
 
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
@@ -78,7 +84,7 @@ router.get("/posts", async (req, res) => {
     });
 
     let sortPost;
-    if (search || category || radius || price) {
+    if (search || category || radius || price || (lat && lon)) {
       sortPost = WithDistanceAndDistance;
     } else {
       sortPost = WithDistanceAndDistance.sort(
