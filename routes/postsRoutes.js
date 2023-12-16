@@ -241,7 +241,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
 
-      const responseRestaurantPost = {
+      const restaurantResponsePost = {
         ...post.dataValues,
         pickupTime: pickupTimeUnix,
         createdAt: createdAtUnix,
@@ -249,14 +249,14 @@ router.get("/recommendation/restaurant", async (req, res) => {
         distance,
       };
 
-      return responseRestaurantPost;
+      return restaurantResponsePost;
     });
 
-    const sortedRestaurants = restaurantWithDistance.sort(
+    const restaurantSort = restaurantWithDistance.sort(
       (a, b) => a.distance - b.distance
     );
 
-    const restaurantPost = sortedRestaurants.slice(0, 5);
+    const restaurantPost = restaurantSort.slice(0, 5);
     res.status(200).json({ restaurants: restaurantPost });
   } catch (error) {
     console.error("Error fetching nearby restaurant recommendations", error);
