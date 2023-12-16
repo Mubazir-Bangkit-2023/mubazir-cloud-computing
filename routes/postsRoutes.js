@@ -57,31 +57,38 @@ router.get("/posts", async (req, res) => {
 
     const posts = await Post.findAll({ where: whereCondition });
 
-    const WithDistanceAndDistance = posts.map((post) => {
-      const locationPosts = {
-        latitude: parseFloat(post.lat),
-        longitude: parseFloat(post.lon),
-      };
+    const WithDistanceAndDistance = posts
+      .map((post) => {
+        const locationPosts = {
+          latitude: parseFloat(post.lat),
+          longitude: parseFloat(post.lon),
+        };
 
-      const distance =
-        userLocation.latitude && userLocation.longitude
-          ? geolib.getDistance(userLocation, locationPosts)
-          : null;
+        const distance =
+          userLocation.latitude && userLocation.longitude
+            ? geolib.getDistance(userLocation, locationPosts)
+            : null;
 
-      const pickupTimeUnix = moment(post.pickupTime).unix();
-      const createdAtUnix = moment(post.createdAt).unix();
-      const updateAtUnix = moment(post.updatedAt).unix();
+        const pickupTimeUnix = moment(post.pickupTime).unix();
+        const createdAtUnix = moment(post.createdAt).unix();
+        const updateAtUnix = moment(post.updatedAt).unix();
 
-      const postResponses = {
-        ...post.dataValues,
-        pickupTime: pickupTimeUnix,
-        createdAt: createdAtUnix,
-        updatedAt: updateAtUnix,
-        distance,
-      };
+        const postResponses = {
+          ...post.dataValues,
+          pickupTime: pickupTimeUnix,
+          createdAt: createdAtUnix,
+          updatedAt: updateAtUnix,
+          distance,
+        };
 
-      return postResponses;
-    });
+        return postResponses;
+      })
+      .filter((post) => {
+        // Filter posts based on the specified radius
+        return (
+          !radius || (post.distance && post.distance <= parseFloat(radius))
+        );
+      });
 
     let sortPost;
 
@@ -340,7 +347,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
     };
     const rawIngredientsPosts = await Post.findAll({
       where: {
-        categoryId: 3, 
+        categoryId: 3,
       },
     });
     const withDistance = rawIngredientsPosts.map((post) => {
@@ -354,7 +361,6 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
 
-
       const responseRawIngredientsPost = {
         ...post.dataValues,
         pickupTime: pickupTimeUnix,
@@ -365,7 +371,6 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
 
       return responseRawIngredientsPost;
     });
-
 
     const sort = withDistance.sort((a, b) => a.distance - b.distance);
 
