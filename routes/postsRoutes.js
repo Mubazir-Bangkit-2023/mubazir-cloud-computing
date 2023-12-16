@@ -192,7 +192,7 @@ router.get("/recommendation/nearby", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+      const distance = geolib.getDistance(userLocation, locationPosts, 1);
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
@@ -241,7 +241,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+      const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
@@ -292,7 +292,7 @@ router.get("/recommendation/homefood", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+      const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
       // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
@@ -344,7 +344,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+      const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
       // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
