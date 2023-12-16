@@ -32,7 +32,7 @@ router.get("/posts", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const location_user = {
+    const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -60,34 +60,34 @@ router.get("/posts", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
 
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
-      const responsePost = {
+      const postResponses = {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
         distance,
       };
 
-      return responsePost;
+      return postResponses;
     });
 
-    let sortedPosts;
+    let sortPost;
     if (search || category || radius || price) {
-      sortedPosts = WithDistanceAndDistance;
+      sortPost = WithDistanceAndDistance;
     } else {
-      sortedPosts = WithDistanceAndDistance.sort(
+      sortPost = WithDistanceAndDistance.sort(
         (a, b) => b.createdAt - a.createdAt
       );
     }
 
-    const paginatedPosts = sortedPosts.slice(offset, offset + parseInt(limit));
-    res.status(200).json({ posts: paginatedPosts, page, limit });
+    const pagePost = sortPost.slice(offset, offset + parseInt(limit));
+    res.status(200).json({ posts: pagePost, page, limit });
   } catch (error) {
     console.error("Error fetching posts", error);
     res.status(500).json({ message: "Internal server error" });
@@ -101,15 +101,15 @@ router.get("/latest", async (req, res) => {
     });
 
     const postsWithUnixTimestamps = latestPosts.map((post) => {
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
       return {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
       };
     });
 
@@ -135,18 +135,18 @@ router.get("/posts/:id", async (req, res) => {
       return res.status(404).json({ message: "Post not found" });
     }
 
-    const unixPickupTime = moment(post.pickupTime).unix();
-    const unixCreatedAt = moment(post.createdAt).unix();
-    const unixUpdatedAt = moment(post.updatedAt).unix();
+    const pickupTimeUnix = moment(post.pickupTime).unix();
+    const createdAtUnix = moment(post.createdAt).unix();
+    const updateAtUnix = moment(post.updatedAt).unix();
 
-    const responsePost = {
+    const postResponses = {
       ...post.toJSON(),
-      pickupTime: unixPickupTime,
-      createdAt: unixCreatedAt,
-      updatedAt: unixUpdatedAt,
+      pickupTime: pickupTimeUnix,
+      createdAt: createdAtUnix,
+      updatedAt: updateAtUnix,
     };
 
-    res.status(200).json(responsePost);
+    res.status(200).json(postResponses);
   } catch (error) {
     console.error("Error fetching post", error);
     res.status(500).json({ message: "Internal server error" });
@@ -176,7 +176,7 @@ router.get("/recommendation/nearby", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const location_user = {
+    const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -186,20 +186,20 @@ router.get("/recommendation/nearby", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(location_user, locationPosts, 1);
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
-      const responsePost = {
+      const postResponses = {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
         distance,
       };
 
-      return responsePost;
+      return postResponses;
     });
     const sortPosts = WithDistance.sort((a, b) => a.distance - b.distance);
     const nearbyPosts = sortPosts.slice(0, 5);
@@ -220,7 +220,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
         .json({ message: "Missing latitude or longitude parameters" });
     }
 
-    const location_user = {
+    const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -235,17 +235,17 @@ router.get("/recommendation/restaurant", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
 
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
       const responseRestaurantPost = {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
         distance,
       };
 
@@ -272,7 +272,7 @@ router.get("/recommendation/homefood", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const location_user = {
+    const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -286,19 +286,19 @@ router.get("/recommendation/homefood", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
 
       // Convert timestamps to Unix format
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
       // Create the response object with Unix timestamps and distance
       const responseHomefoodPost = {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
         distance,
       };
 
@@ -324,7 +324,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
         .status(400)
         .json({ message: "Missing latitude or longitude parameters" });
     }
-    const location_user = {
+    const userLocation = {
       latitude: parseFloat(lat),
       longitude: parseFloat(lon),
     };
@@ -338,19 +338,19 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
         latitude: parseFloat(post.lat),
         longitude: parseFloat(post.lon),
       };
-      const distance = geolib.getDistance(location_user, locationPosts, 1);
+      const distance = geolib.distanceGet(userLocation, locationPosts, 1);
 
       // Convert timestamps to Unix format
-      const unixPickupTime = moment(post.pickupTime).unix();
-      const unixCreatedAt = moment(post.createdAt).unix();
-      const unixUpdatedAt = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
       // Create the response object with Unix timestamps and distance
       const responseRawIngredientsPost = {
         ...post.dataValues,
-        pickupTime: unixPickupTime,
-        createdAt: unixCreatedAt,
-        updatedAt: unixUpdatedAt,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
         distance,
       };
 
@@ -389,15 +389,15 @@ router.get(
       });
 
       const postsWithUnixTimestamps = posts.map((post) => {
-        const unixPickupTime = moment(post.pickupTime).unix();
-        const unixCreatedAt = moment(post.createdAt).unix();
-        const unixUpdatedAt = moment(post.updatedAt).unix();
+        const pickupTimeUnix = moment(post.pickupTime).unix();
+        const createdAtUnix = moment(post.createdAt).unix();
+        const updateAtUnix = moment(post.updatedAt).unix();
 
         return {
           ...post.dataValues,
-          pickupTime: unixPickupTime,
-          createdAt: unixCreatedAt,
-          updatedAt: unixUpdatedAt,
+          pickupTime: pickupTimeUnix,
+          createdAt: createdAtUnix,
+          updatedAt: updateAtUnix,
         };
       });
 
