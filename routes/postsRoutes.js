@@ -435,7 +435,7 @@ router.post(
     } = req.body;
 
     try {
-      const tokenDecode = req.authData; // Use the decoded token from middleware
+      const tokenDecode = req.authData;
       const categoryExists = await Category.findByPk(categoryId);
 
       if (!categoryExists) {
