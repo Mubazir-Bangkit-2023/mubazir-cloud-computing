@@ -57,31 +57,38 @@ router.get("/posts", async (req, res) => {
 
     const posts = await Post.findAll({ where: whereCondition });
 
-    const WithDistanceAndDistance = posts.map((post) => {
-      const locationPosts = {
-        latitude: parseFloat(post.lat),
-        longitude: parseFloat(post.lon),
-      };
+    const WithDistanceAndDistance = posts
+      .map((post) => {
+        const locationPosts = {
+          latitude: parseFloat(post.lat),
+          longitude: parseFloat(post.lon),
+        };
 
-      const distance =
-        userLocation.latitude && userLocation.longitude
-          ? geolib.getDistance(userLocation, locationPosts)
-          : null;
+        const distance =
+          userLocation.latitude && userLocation.longitude
+            ? geolib.getDistance(userLocation, locationPosts)
+            : null;
 
-      const pickupTimeUnix = moment(post.pickupTime).unix();
-      const createdAtUnix = moment(post.createdAt).unix();
-      const updateAtUnix = moment(post.updatedAt).unix();
+        const pickupTimeUnix = moment(post.pickupTime).unix();
+        const createdAtUnix = moment(post.createdAt).unix();
+        const updateAtUnix = moment(post.updatedAt).unix();
 
-      const postResponses = {
-        ...post.dataValues,
-        pickupTime: pickupTimeUnix,
-        createdAt: createdAtUnix,
-        updatedAt: updateAtUnix,
-        distance,
-      };
+        const postResponses = {
+          ...post.dataValues,
+          pickupTime: pickupTimeUnix,
+          createdAt: createdAtUnix,
+          updatedAt: updateAtUnix,
+          distance,
+        };
 
-      return postResponses;
-    });
+        return postResponses;
+      })
+      .filter((post) => {
+        // Filter posts based on the specified radius
+        return (
+          !radius || (post.distance && post.distance <= parseFloat(radius))
+        );
+      });
 
     let sortPost;
 
@@ -300,6 +307,7 @@ router.get("/recommendation/homefood", async (req, res) => {
       };
       const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
+      // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
@@ -316,6 +324,7 @@ router.get("/recommendation/homefood", async (req, res) => {
       return responseHomefoodPost;
     });
 
+    // Sort by distance after timestamp conversion
     const sortHomefood = withDistance.sort((a, b) => a.distance - b.distance);
 
     const homefoodPost = sortHomefood.slice(0, 5);
@@ -340,7 +349,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
     };
     const rawIngredientsPosts = await Post.findAll({
       where: {
-        categoryId: 3,
+        categoryId: 3, // Category ID for "raw ingredients"
       },
     });
     const withDistance = rawIngredientsPosts.map((post) => {
@@ -350,10 +359,12 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       };
       const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
+      // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
 
+      // Create the response object with Unix timestamps and distance
       const responseRawIngredientsPost = {
         ...post.dataValues,
         pickupTime: pickupTimeUnix,
@@ -365,6 +376,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       return responseRawIngredientsPost;
     });
 
+    // Sort by distance after timestamp conversion
     const sort = withDistance.sort((a, b) => a.distance - b.distance);
 
     const rawIngredientsPost = sort.slice(0, 5);
@@ -453,7 +465,7 @@ router.post(
       try {
         const datetime = moment.unix(pickupTime);
         formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-        numericDateTime = datetime.unix() * 1000;
+        numericDateTime = datetime.unix();
       } catch (error) {
         console.error("Error converting pickupTime:", error);
       }
@@ -464,7 +476,6 @@ router.post(
         description,
         price,
         pickupTime: formatDateTime,
-        pickupTimeMillis: numericDateTime,
         imgUrl: imageUrl,
         freshness,
         lat,
@@ -483,7 +494,6 @@ router.post(
     }
   }
 );
-
 //Put Routes
 router.put(
   "/postsUpdate/:id",
