@@ -322,8 +322,6 @@ router.get("/recommendation/homefood", async (req, res) => {
 
       return responseHomefoodPost;
     });
-
-    // Sort by distance after timestamp conversion
     const sortHomefood = withDistance.sort((a, b) => a.distance - b.distance);
 
     const homefoodPost = sortHomefood.slice(0, 5);
