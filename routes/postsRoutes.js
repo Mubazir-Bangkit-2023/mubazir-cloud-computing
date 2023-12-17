@@ -325,7 +325,7 @@ router.get("/recommendation/homefood", async (req, res) => {
     const sortHomefood = withDistance.sort((a, b) => a.distance - b.distance);
 
     const homefoodPost = sortHomefood.slice(0, 5);
-    res.status(200).json({ homefood: homefoodPost });
+    res.status(200).json({ posts: homefoodPost });
   } catch (error) {
     console.error("Error fetching nearby homefood recommendations", error);
     res.status(500).json({ message: "Internal server error" });
@@ -374,7 +374,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
     const sort = withDistance.sort((a, b) => a.distance - b.distance);
 
     const rawIngredientsPost = sort.slice(0, 5);
-    res.status(200).json({ raw_ingredients: rawIngredientsPost });
+    res.status(200).json({ posts: rawIngredientsPost });
   } catch (error) {
     console.error(
       "Error fetching nearby raw ingredients recommendations",
