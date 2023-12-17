@@ -57,38 +57,31 @@ router.get("/posts", async (req, res) => {
 
     const posts = await Post.findAll({ where: whereCondition });
 
-    const WithDistanceAndDistance = posts
-      .map((post) => {
-        const locationPosts = {
-          latitude: parseFloat(post.lat),
-          longitude: parseFloat(post.lon),
-        };
+    const WithDistanceAndDistance = posts.map((post) => {
+      const locationPosts = {
+        latitude: parseFloat(post.lat),
+        longitude: parseFloat(post.lon),
+      };
 
-        const distance =
-          userLocation.latitude && userLocation.longitude
-            ? geolib.getDistance(userLocation, locationPosts)
-            : null;
+      const distance =
+        userLocation.latitude && userLocation.longitude
+          ? geolib.getDistance(userLocation, locationPosts)
+          : null;
 
-        const pickupTimeUnix = moment(post.pickupTime).unix();
-        const createdAtUnix = moment(post.createdAt).unix();
-        const updateAtUnix = moment(post.updatedAt).unix();
+      const pickupTimeUnix = moment(post.pickupTime).unix();
+      const createdAtUnix = moment(post.createdAt).unix();
+      const updateAtUnix = moment(post.updatedAt).unix();
 
-        const postResponses = {
-          ...post.dataValues,
-          pickupTime: pickupTimeUnix,
-          createdAt: createdAtUnix,
-          updatedAt: updateAtUnix,
-          distance,
-        };
+      const postResponses = {
+        ...post.dataValues,
+        pickupTime: pickupTimeUnix,
+        createdAt: createdAtUnix,
+        updatedAt: updateAtUnix,
+        distance,
+      };
 
-        return postResponses;
-      })
-      .filter((post) => {
-        // Filter posts based on the specified radius
-        return (
-          !radius || (post.distance && post.distance <= parseFloat(radius))
-        );
-      });
+      return postResponses;
+    });
 
     let sortPost;
 
@@ -455,10 +448,12 @@ router.post(
         imageUrl = req.file.cloudStoragePublicUrl;
       }
 
-      let pickupTimeMilliseconds = 0;
+      let formatDateTime = "";
+      let numericDateTime = 0;
       try {
         const datetime = moment.unix(pickupTime);
-        pickupTimeMilliseconds = datetime.valueOf();
+        formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+        numericDateTime = datetime.unix();
       } catch (error) {
         console.error("Error converting pickupTime:", error);
       }
@@ -468,7 +463,7 @@ router.post(
         title,
         description,
         price,
-        pickupTime: pickupTimeMilliseconds,
+        pickupTime: formatDateTime,
         imgUrl: imageUrl,
         freshness,
         lat,
