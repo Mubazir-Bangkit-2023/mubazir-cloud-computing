@@ -453,7 +453,7 @@ router.post(
       try {
         const datetime = moment.unix(pickupTime);
         formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-        numericDateTime = datetime.unix();
+        numericDateTime = datetime.unix() * 1000;
       } catch (error) {
         console.error("Error converting pickupTime:", error);
       }
@@ -464,6 +464,7 @@ router.post(
         description,
         price,
         pickupTime: formatDateTime,
+        pickupTimeMillis: numericDateTime,
         imgUrl: imageUrl,
         freshness,
         lat,
