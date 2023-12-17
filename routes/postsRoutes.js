@@ -84,7 +84,6 @@ router.get("/posts", async (req, res) => {
         return postResponses;
       })
       .filter((post) => {
-        // Filter posts based on the specified radius
         return (
           !radius || (post.distance && post.distance <= parseFloat(radius))
         );
@@ -101,7 +100,6 @@ router.get("/posts", async (req, res) => {
     }
 
     if (radius && userLocation.latitude && userLocation.longitude) {
-      // Sort based on distance if radius filter is applied
       sortPost.sort((a, b) => a.distance - b.distance);
     }
 
@@ -307,12 +305,10 @@ router.get("/recommendation/homefood", async (req, res) => {
       };
       const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
-      // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
 
-      // Create the response object with Unix timestamps and distance
       const responseHomefoodPost = {
         ...post.dataValues,
         pickupTime: pickupTimeUnix,
@@ -349,7 +345,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
     };
     const rawIngredientsPosts = await Post.findAll({
       where: {
-        categoryId: 3, // Category ID for "raw ingredients"
+        categoryId: 3,
       },
     });
     const withDistance = rawIngredientsPosts.map((post) => {
@@ -359,12 +355,10 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       };
       const distance = geolib.getDistance(userLocation, locationPosts, 1);
 
-      // Convert timestamps to Unix format
       const pickupTimeUnix = moment(post.pickupTime).unix();
       const createdAtUnix = moment(post.createdAt).unix();
       const updateAtUnix = moment(post.updatedAt).unix();
 
-      // Create the response object with Unix timestamps and distance
       const responseRawIngredientsPost = {
         ...post.dataValues,
         pickupTime: pickupTimeUnix,
@@ -376,7 +370,6 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
       return responseRawIngredientsPost;
     });
 
-    // Sort by distance after timestamp conversion
     const sort = withDistance.sort((a, b) => a.distance - b.distance);
 
     const rawIngredientsPost = sort.slice(0, 5);
