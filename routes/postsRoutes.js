@@ -574,7 +574,7 @@ router.put(
 );
 
 //Delete Routes
-router.delete("/deletePost/:id", async (req, res) => {
+router.delete("/delete/:id", async (req, res) => {
   try {
     const tokenDecode = req.authData;
     const deletedPost = await Post.destroy({
