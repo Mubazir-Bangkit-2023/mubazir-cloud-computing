@@ -55,7 +55,10 @@ router.get("/posts", async (req, res) => {
       whereCondition.price = { [Op.lte]: parseFloat(price) };
     }
 
-    const posts = await Post.findAll({ where: whereCondition });
+    const posts = await Post.findAll({
+      where: whereCondition,
+      order: [["createdAt", "DESC"]],
+    });
 
     const WithDistanceAndDistance = posts
       .map((post) => {
