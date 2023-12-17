@@ -277,7 +277,7 @@ router.get("/recommendation/restaurant", async (req, res) => {
     );
 
     const restaurantPost = restaurantSort.slice(0, 5);
-    res.status(200).json({ restaurants: restaurantPost });
+    res.status(200).json({ posts: restaurantPost });
   } catch (error) {
     console.error("Error fetching nearby restaurant recommendations", error);
     res.status(500).json({ message: "Internal server error" });
