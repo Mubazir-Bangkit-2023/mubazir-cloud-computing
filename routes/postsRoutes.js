@@ -455,12 +455,10 @@ router.post(
         imageUrl = req.file.cloudStoragePublicUrl;
       }
 
-      let formatDateTime = "";
-      let numericDateTime = 0;
+      let pickupTimeMilliseconds = 0;
       try {
         const datetime = moment.unix(pickupTime);
-        formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-        numericDateTime = datetime.unix();
+        pickupTimeMilliseconds = datetime.valueOf();
       } catch (error) {
         console.error("Error converting pickupTime:", error);
       }
@@ -470,7 +468,7 @@ router.post(
         title,
         description,
         price,
-        pickupTime: formatDateTime,
+        pickupTime: pickupTimeMilliseconds,
         imgUrl: imageUrl,
         freshness,
         lat,
