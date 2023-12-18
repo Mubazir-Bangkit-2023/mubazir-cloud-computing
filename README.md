@@ -17,7 +17,7 @@
 
 3. create .env file
 
-   '''bash
+   ```bash
    DB_NAME=#your_db
    DB_USER=#your_db_user
    DB_PASSWORD=#your_db_passwd
