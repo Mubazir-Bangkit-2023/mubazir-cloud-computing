@@ -575,12 +575,16 @@ router.put(
 router.delete("/posts/delete/:id", async (req, res) => {
   try {
     const tokenDecode = req.authData;
+    if (!tokenDecode || !tokenDecode.id) {
+      return res.status(401).json({ message: "Unauthorized: Invalid token" });
+    }
     const deletedPost = await Post.destroy({
       where: {
         id: req.params.id,
         userId: tokenDecode.id,
       },
     });
+
     if (!deletedPost) {
       return res
         .status(404)
