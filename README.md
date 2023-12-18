@@ -12,4 +12,6 @@
    ```bash
    npm install
 
-3. 
+3. Start :
+   ```bash
+   node app.js
