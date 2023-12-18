@@ -572,30 +572,51 @@ router.put(
 );
 
 //Delete Routes
-router.delete("/posts/delete/:id", async (req, res) => {
-  try {
-    const tokenDecode = req.authData;
-    if (!tokenDecode || !tokenDecode.id) {
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
-    const deletedPost = await Post.destroy({
-      where: {
-        id: req.params.id,
-        userId: tokenDecode.id,
-      },
-    });
+router.delete(
+  "/posts/delete/:id",
+  authMiddleware.authenticateToken,
+  async (req, res) => {
+    try {
+      const tokenDecode = req.authData;
 
-    if (!deletedPost) {
-      return res
-        .status(404)
-        .json({ message: "Post not found or unauthorized" });
+      if (!tokenDecode || !tokenDecode.id) {
+        return res.status(401).json({ message: "Unauthorized: Invalid token" });
+      }
+
+      const postId = req.params.id;
+
+      const postToDelete = await Post.findOne({
+        where: {
+          id: postId,
+          userId: tokenDecode.id,
+        },
+      });
+
+      if (!postToDelete) {
+        return res
+          .status(404)
+          .json({ message: "Post not found or unauthorized" });
+      }
+      const deletedPost = await Post.destroy({
+        where: {
+          id: postId,
+          userId: tokenDecode.id,
+        },
+      });
+
+      if (!deletedPost) {
+        return res
+          .status(404)
+          .json({ message: "Post not found or unauthorized" });
+      }
+
+      res.status(200).json({ message: "Post deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting post", error);
+      res.status(500).json({ message: "Internal server error" });
     }
-    res.status(200).json({ message: "Post deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting post", error);
-    res.status(500).json({ message: "Internal server error" });
   }
-});
+);
 
 //update user
 router.put(
