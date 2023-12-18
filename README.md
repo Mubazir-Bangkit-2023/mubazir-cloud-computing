@@ -15,6 +15,20 @@
    ```bash
    npm install
 
-3. Start :
+3. create .env file
+
+   '''bash
+   DB_NAME=#your_db
+   DB_USER=#your_db_user
+   DB_PASSWORD=#your_db_passwd
+   DB_HOST=#your_db_ip
+   DB_DIALECT=mysql
+   PORT=#your_port
+   DB_SOCKET_PATH= cloudsql/#your_project-id:#your_region:#your_cloud_sql_name
+   SECRET_KEY = #your_secret_key
+   PROJECT_ID=#your_project_id
+   BUCKET_NAME=#your_bucket_name
+
+5. Start :
    ```bash
    node app.js
