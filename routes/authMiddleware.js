@@ -12,7 +12,6 @@ const authenticateToken = (req, res, next) => {
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET_KEY);
 
-    // Pastikan properti yang Anda periksa ada dalam payload token
     if (!decodedToken || !decodedToken.hasOwnProperty("id")) {
       return res
         .status(401)
