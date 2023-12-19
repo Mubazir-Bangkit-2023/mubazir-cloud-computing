@@ -24,15 +24,16 @@
 </pre>
 
 #### Cloud Run
-<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43" width="65px" height="80px">
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43" width="70px" height="80px">
 <br>
 <pre>
    <span style="font-size: 18px; color: #3366cc;">Text here...</span>
    <span style="font-size: 18px; color: #3366cc;">Text here...</span>
    <span style="font-size: 18px; color: #3366cc;">Text here...</span>
 </pre>
+
 #### Artifact Registry
-<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/453f125a-684a-4a49-8f37-d1d6acdecfee" width="65px" height="80px">
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/453f125a-684a-4a49-8f37-d1d6acdecfee" width="70px" height="80px">
 <br>
 <pre>
    <span style="font-size: 18px; color: #3366cc;">Text here...</span>
