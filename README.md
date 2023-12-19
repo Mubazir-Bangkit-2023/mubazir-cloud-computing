@@ -9,8 +9,8 @@
 <br><pre>
    <span style="font-size: 18px; color: #3366cc;">Database type: mysql</span>
    <span style="font-size: 18px; color: #3366cc;">Version : 8.0 </span>
-   <span style="font-size: 18px; color: #3366cc;">Memory : 614.4 Mb </span>
-   <span style="font-size: 18px; color: #3366cc;">Storage : 10 Gb </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 614.4 MB </span>
+   <span style="font-size: 18px; color: #3366cc;">Storage : 10 GB </span>
    <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
 </pre>
 
@@ -27,9 +27,9 @@
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43" width="70px" height="80px">
 <br>
 <pre>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
+   <span style="font-size: 18px; color: #3366cc;">Location : asia-southeast2 (Jakarta) </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 512 MB </span>
+   <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
 </pre>
 
 #### Artifact Registry
