@@ -5,7 +5,7 @@
 ## Technology Used
 
 #### Cloud SQL
-![Cloud SQL](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33 =200x)
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33" width="30%" height="30%">
 
 #### Cloud Storage
 ![Google Cloud Storage](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc =200x)
