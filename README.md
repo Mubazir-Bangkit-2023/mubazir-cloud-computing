@@ -3,7 +3,12 @@
 
 
 # Technology Used 
+# Cloud SQL 
 
+# Cloud Storage
+# Cloud Run
+# Artifact Registry
+ 
 # Installation
 1. clone :
 
