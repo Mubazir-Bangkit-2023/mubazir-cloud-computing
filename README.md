@@ -32,13 +32,11 @@
    <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
 </pre>
 
-#### Artifact Registry
+#### Container Registry
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/453f125a-684a-4a49-8f37-d1d6acdecfee" width="70px" height="75px">
 <br>
 <pre>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
-   <span style="font-size: 18px; color: #3366cc;">Text here...</span>
+   <span style="font-size: 18px; color: #3366cc;">Storage : 10 GB...</span>
 </pre>
 ## Installation
 
