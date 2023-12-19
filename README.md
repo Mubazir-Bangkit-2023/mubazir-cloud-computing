@@ -4,11 +4,15 @@
 
 ## Technology Used 
 ## Cloud SQL 
+![cloud_sql-removebg-preview](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33)
+
 
 ## Cloud Storage
+![google_cloud_storage](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc)
 ## Cloud Run
+![google-cloud-run-logo-895F1305FF-seeklogo com](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43)
 ## Artifact Registry
- 
+![1_ajSlM5ISpMEiuZbPb2DCAg-removebg-preview](https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/453f125a-684a-4a49-8f37-d1d6acdecfee) 
 ## Installation
 1. clone :
 
