@@ -10,7 +10,7 @@
 Database type : mysql
  
 #### Cloud Storage
-<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="60px" height="80px">
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="65px" height="80px">
 
 #### Cloud Run
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43" width="60px" height="80px">
