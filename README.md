@@ -8,9 +8,7 @@
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33" width="60px" height="80px">
 ```bash
 Database type : mysql
-Version :
-Storage : 
-Memory :  
+ 
 #### Cloud Storage
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="60px" height="80px">
 
