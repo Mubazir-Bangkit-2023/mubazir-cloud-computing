@@ -6,7 +6,13 @@
 
 #### Cloud SQL
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33" width="65px" height="80px">
-<br><pre><span style="font-size: 18px; color: #3366cc;">Database type: mysql</span></pre>
+<br><pre>
+   <span style="font-size: 18px; color: #3366cc;">Database type: mysql</span>
+   <span style="font-size: 18px; color: #3366cc;">Version : 8.0 </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 614.4 Mb </span>
+   <span style="font-size: 18px; color: #3366cc;">Storage : 10 Gb </span>
+   <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
+</pre>
 
 #### Cloud Storage
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="65px" height="80px">
