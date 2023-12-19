@@ -15,7 +15,7 @@
 </pre>
 
 #### Cloud Storage
-<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="65px" height="80px">
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="65px" height="75px">
 <br>
 <pre>
    <span style="font-size: 18px; color: #3366cc;">Location Type : Region </span>
