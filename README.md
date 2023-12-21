@@ -1,14 +1,49 @@
-# mubazir-cloud-computing
+# Mubazir Cloud Computing
+
 <img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ed84e5bf-4c56-45cc-ba91-e99c6d8e4aab" width="100%" height="50%">
 
+## Technology Used
 
-# Technology Used 
+#### Cloud SQL
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/d4e252f2-151e-4973-b9b1-8d7b164dce33" width="65px" height="80px">
+<br><pre>
+   <span style="font-size: 18px; color: #3366cc;">Database type: mysql</span>
+   <span style="font-size: 18px; color: #3366cc;">Version : 8.0 </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 614.4 MB </span>
+   <span style="font-size: 18px; color: #3366cc;">Storage : 10 GB </span>
+   <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
+</pre>
 
-# Installation
-1. clone :
+#### Cloud Storage
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/ac9ff32e-dd59-4368-a02b-d239df606ddc" width="65px" height="75px">
+<br>
+<pre>
+   <span style="font-size: 18px; color: #3366cc;">Location Type : Region </span>
+   <span style="font-size: 18px; color: #3366cc;">Location : asia-southeast2 (Jakarta)</span>
+   <span style="font-size: 18px; color: #3366cc;">Storage Class : Standard</span>
+</pre>
+
+#### Cloud Run
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/fda0b2ea-8b04-4bf2-b6c0-3906b7cb6c43" width="70px" height="75px">
+<br>
+<pre>
+   <span style="font-size: 18px; color: #3366cc;">Location : asia-southeast2 (Jakarta) </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 512 MB </span>
+   <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
+</pre>
+
+#### Container Registry
+<img src="https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing/assets/96626242/453f125a-684a-4a49-8f37-d1d6acdecfee" width="70px" height="75px">
+<br>
+<pre>
+   <span style="font-size: 18px; color: #3366cc;">Storage : 10 GB...</span>
+</pre>
+## Installation
+
+1. Clone the repository:
 
    ```bash
-   https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing.git
+   git clone https://github.com/Mubazir-Bangkit-2023/mubazir-cloud-computing.git
 
 2. Install :
 
