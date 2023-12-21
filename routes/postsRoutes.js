@@ -11,7 +11,7 @@ const moment = require("moment");
 const geolib = require("geolib");
 
 const { invalidatedTokens } = require("./auth");
-const authMiddleware = require("./authMiddleware");
+const middlewareAuth = require("./middlewareAuth");
 
 router.get("/posts", async (req, res) => {
   try {
@@ -386,7 +386,7 @@ router.get("/recommendation/rawIngredients", async (req, res) => {
 
 router.get(
   "/user/posts",
-  authMiddleware.authenticateToken,
+  middlewareAuth.authenticateToken,
   async (req, res) => {
     try {
       const userId = req.authData.id;
@@ -427,7 +427,7 @@ router.post(
   "/posts/food",
   ImgUpload.uploadToGcs,
   ImgUpload.handleUpload,
-  authMiddleware.authenticateToken,
+  middlewareAuth.authenticateToken,
   async (req, res) => {
     const {
       title,
@@ -488,93 +488,93 @@ router.post(
     }
   }
 );
-//Put Routes
-router.put(
-  "/postsUpdate/:id",
-  ImgUpload.uploadToGcs,
-  ImgUpload.handleUpload,
-  async (req, res) => {
-    const postId = req.params.id;
-    try {
-      const post = await Post.findByPk(postId);
-      if (!post) {
-        return res.status(404).json({ message: "Post not found" });
-      }
-      const tokenDecode = req.authData;
+// //Put Routes
+// router.put(
+//   "/postsUpdate/:id",
+//   ImgUpload.uploadToGcs,
+//   ImgUpload.handleUpload,
+//   async (req, res) => {
+//     const postId = req.params.id;
+//     try {
+//       const post = await Post.findByPk(postId);
+//       if (!post) {
+//         return res.status(404).json({ message: "Post not found" });
+//       }
+//       const tokenDecode = req.authData;
 
-      if (!tokenDecode.id) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: User not logged in" });
-      }
-      if (tokenDecode.id !== post.userId) {
-        return res.status(403).json({
-          message:
-            "Forbidden: User does not have permission to update this post",
-        });
-      }
+//       if (!tokenDecode.id) {
+//         return res
+//           .status(401)
+//           .json({ message: "Unauthorized: User not logged in" });
+//       }
+//       if (tokenDecode.id !== post.userId) {
+//         return res.status(403).json({
+//           message:
+//             "Forbidden: User does not have permission to update this post",
+//         });
+//       }
 
-      const {
-        title,
-        description,
-        price,
-        lat,
-        lon,
-        freshness,
-        categoryId,
-        isAvailable,
-        pickupTime,
-      } = req.body;
+//       const {
+//         title,
+//         description,
+//         price,
+//         lat,
+//         lon,
+//         freshness,
+//         categoryId,
+//         isAvailable,
+//         pickupTime,
+//       } = req.body;
 
-      if (!pickupTime) {
-        return res.status(400).json({ message: "pickupTime is required" });
-      }
+//       if (!pickupTime) {
+//         return res.status(400).json({ message: "pickupTime is required" });
+//       }
 
-      let formatDateTime = "";
-      try {
-        const datetime = moment.unix(pickupTime);
-        formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
-      } catch (error) {
-        console.error("Error converting pickupTime:", error);
-        return res.status(400).json({ message: "Invalid pickupTime format" });
-      }
+//       let formatDateTime = "";
+//       try {
+//         const datetime = moment.unix(pickupTime);
+//         formatDateTime = datetime.format("YYYY-MM-DD HH:mm:ss");
+//       } catch (error) {
+//         console.error("Error converting pickupTime:", error);
+//         return res.status(400).json({ message: "Invalid pickupTime format" });
+//       }
 
-      post.title = title;
-      post.description = description;
-      post.price = price;
-      post.pickupTime = formatDateTime;
-      post.lat = lat;
-      post.lon = lon;
-      post.freshness = freshness;
-      post.categoryId = categoryId;
-      post.isAvailable = isAvailable;
+//       post.title = title;
+//       post.description = description;
+//       post.price = price;
+//       post.pickupTime = formatDateTime;
+//       post.lat = lat;
+//       post.lon = lon;
+//       post.freshness = freshness;
+//       post.categoryId = categoryId;
+//       post.isAvailable = isAvailable;
 
-      if (req.file && req.file.cloudStoragePublicUrl) {
-        post.imgUrl = req.file.cloudStoragePublicUrl;
-      }
+//       if (req.file && req.file.cloudStoragePublicUrl) {
+//         post.imgUrl = req.file.cloudStoragePublicUrl;
+//       }
 
-      await post.save();
-      res.status(200).json({ message: "Post updated successfully", post });
-    } catch (error) {
-      console.error("Error updating post", error);
-      const token =
-        req.headers["authorization"] &&
-        req.headers["authorization"].split(" ")[1];
+//       await post.save();
+//       res.status(200).json({ message: "Post updated successfully", post });
+//     } catch (error) {
+//       console.error("Error updating post", error);
+//       const token =
+//         req.headers["authorization"] &&
+//         req.headers["authorization"].split(" ")[1];
 
-      if (invalidatedTokens && invalidatedTokens.has(token)) {
-        return res
-          .status(401)
-          .json({ message: "Unauthorized: Token invalidated" });
-      }
-      return res.status(401).json({ message: "Unauthorized: Invalid token" });
-    }
-  }
-);
+//       if (invalidatedTokens && invalidatedTokens.has(token)) {
+//         return res
+//           .status(401)
+//           .json({ message: "Unauthorized: Token invalidated" });
+//       }
+//       return res.status(401).json({ message: "Unauthorized: Invalid token" });
+//     }
+//   }
+// );
 
 //Delete Routes
 router.delete(
   "/posts/delete/:id",
-  authMiddleware.authenticateToken,
+  middlewareAuth.authenticateToken,
   async (req, res) => {
     try {
       const tokenDecode = req.authData;
@@ -621,7 +621,7 @@ router.delete(
 //update user
 router.put(
   "/updateUser",
-  authMiddleware.authenticateToken,
+  middlewareAuth.authenticateToken,
   async (req, res) => {
     try {
       const userId = req.authData.id;
