@@ -28,7 +28,7 @@
 <br>
 <pre>
    <span style="font-size: 18px; color: #3366cc;">Location : asia-southeast2 (Jakarta) </span>
-   <span style="font-size: 18px; color: #3366cc;">Memory : 512 MB </span>
+   <span style="font-size: 18px; color: #3366cc;">Memory : 1 GB </span>
    <span style="font-size: 18px; color: #3366cc;">vCPUs : 1 </span>
 </pre>
 
